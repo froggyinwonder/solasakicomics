@@ -1,1 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Solasaki Comics — Comics & Daily Write-ups</title>
 
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       THEME VARIABLES: LIGHT (DEFAULT)
+       ============================================ */
+    :root {
+      --bg: #f7f5f1;             /* sketchbook cream */
+      --paper: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --accent: #b88fbf;         /* lavender */
+      --border: rgba(0,0,0,0.10);
+      --shadow: rgba(0,0,0,0.08);
+      --radius: 14px;
+      --gap: 18px;
+      --max-width: 1100px;
+    }
+
+    /* ============================================
+       DARK MODE (MANUAL OR AUTO)
+       ============================================ */
+    :root.dark {
+      --bg: #1a1a1a;             /* charcoal sketchbook */
+      --paper: #222222;
+      --text: #f2f2f2;
+      --muted: #bdbdbd;
+      --accent: #d7b6e6;
+      --border: rgba(255,255,255,0.14);
+      --shadow: rgba(0,0,0,0.45);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light):not(.dark) {
+        --bg: #1a1a1a;
+        --paper: #222;
+        --text: #f2f2f2;
+        --muted: #bdbdbd;
+        --accent: #d7b6e6;
+        --border: rgba(255,255,255,0.14);
+        --shadow: rgba(0,0,0,0.45);
+      }
+    }
+
+    /* ============================================
+       GLOBAL RESET + TYPOGRAPHY
+       ============================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background .35s ease, color .35s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: 60px;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    h1, h2, h3 {
+      font-family: "Patrick Hand", sans-serif;
+      margin: 0;
+      color: var(--text);
+    }
+
+    p { margin: 0 0 12px 0; }
+
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ============================================
+       LAYOUT WRAPPER
+       ============================================ */
+    .site {
+      max-width: var(--max-width);
+      margin: 28px auto;
+      padding: 18px;
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius);
+      border: 3px dashed rgba(0,0,0,0.06);
+      background: linear-gradient(135deg, #fff 0%, #f3eef6 100%);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Patrick Hand";
+      font-size: 28px;
+    }
+
+    nav {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    nav a {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: 0.15s ease;
+    }
+
+    nav a:hover {
+      background: rgba(0,0,0,0.05);
+      transform: translateY(-2px);
+    }
+
+    .cta {
+      background: var(--text);
+      color: var(--paper);
+      border-radius: 10px;
+    }
+
+    .theme-toggle {
+      border: none;
+      background: var(--paper);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 3px 10px var(--shadow);
+      transition: all .2s ease;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-3px);
+    }
+
+    /* ============================================
+       HERO
+       ============================================ */
+    .hero-panel {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--paper);
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 30px var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .hero-text {
+      position: absolute;
+      left: 20px;
+      bottom: 22px;
+      background: rgba(255,255,255,0.85);
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(6px);
+    }
+
+    :root.dark .hero-text {
+      background: rgba(34,34,34,0.85);
+    }
+
+    .hero-text p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .doodle {
+      position: absolute;
+      right: -20px;
+      top: -20px;
+      opacity: .12;
+      font-size: 90px;
+      pointer-events: none;
+    }
+
+    /* ============================================
+       PANEL
+       ============================================ */
+    .panel {
+      background: var(--paper);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      box-shadow: 0 6px 20px var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    /* ============================================
+       COMICS GRID
+       ============================================ */
+    .comics-grid {
+      column-count: 2;
+      column-gap: var(--gap);
+    }
+
+    @media (max-width: 900px) {
+      .comics-grid { column-count: 1; }
+    }
+
+    .comic-tile {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: var(--gap);
+      break-inside: avoid;
+      background: var(--paper);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 6px;
+      box-shadow: 0 6px 18px var(--shadow);
+      transition: all .2s ease;
+    }
+
+    .comic-tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 36px var(--shadow);
+    }
+
+    /* ============================================
+       WRITE-UPS
+       ============================================ */
+    .write-card {
+      background: var(--paper);
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      box-shadow: 0 8px 18px var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .write-card h3 {
+      margin: 0 0 6px 0;
+      font-family: "Patrick Hand";
+      font-size: 20px;
+    }
+
+    .write-card p {
+      color: var(--muted);
+    }
+
+    /* ============================================
+       INSTAGRAM FEED
+       ============================================ */
+    .insta-area {
+      background: var(--paper);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .insta-area h3 {
+      margin-bottom: 12px;
+    }
+
+    .instagram-media {
+      max-width: 100% !important;
+    }
+
+    /* ============================================
+       CONTACT FORM
+       ============================================ */
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    button.submit-btn {
+      padding: 10px 18px;
+      background: var(--text);
+      color: var(--paper);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    footer {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+<div class="site">
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1 style="margin:0;">Solasaki Comics</h1>
+        <div style="color:var(--muted);font-size:12px;">Comics & Daily Write-ups</div>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#comics">Comics</a>
+      <a href="#writeups">Daily Write-ups</a>
+      <a href="#about">About</a>
+      <a class="cta" href="#contact">Contact</a>
+      <button id="themeToggle" class="theme-toggle">🌙</button>
+    </nav>
+  </header>
+
+
+  <!-- ============================================
+       HERO SECTION
+       ============================================ -->
+  <section id="home">
+    <div class="hero-panel">
+      <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600" alt="hero background">
+      <div class="hero-text">
+        <h1>Solasaki Comics</h1>
+        <p>Ink, emotions, tiny stories — all from the quiet corners of life.</p>
+      </div>
+      <div class="doodle">✦</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       COMICS PANEL
+       ============================================ -->
+  <section id="comics">
+    <div class="panel">
+      <h2>Comics</h2>
+      <p>Selected comics, directly from Instagram ↓</p>
+
+      <div class="comics-grid">
+
+        <!-- COMIC 1 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DBUjpkaT5tf/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 2 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/CE8UAGdpcWw/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 3 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DM0NGCkBWRG/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 4 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/CFuNjKYJQuG/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 5 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/C57hQ1axk44/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 6 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DDxNUYjhOKE/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 7 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/C6BfqpDSqaj/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+        <!-- COMIC 8 -->
+        <div class="comic-tile">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/C1ejfBjSaSa/"
+            data-instgrm-version="14"></blockquote>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       LIVE INSTAGRAM FEED (ELFSIGHT)
+       ============================================ -->
+  <div class="insta-area">
+    <h3>More from Instagram</h3>
+    <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3" data-elfsight-app-lazy></div>
+    <script src="https://elfsightcdn.com/platform.js" async></script>
+  </div>
+
+
+  <!-- ============================================
+       WRITEUPS (CMS OUTPUT)
+       ============================================ -->
+  <section id="writeups" style="margin-top:40px;">
+    <div class="panel">
+      <h2>Daily Write-ups</h2>
+      <div id="writeups-container">Loading writings…</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       ABOUT
+       ============================================ -->
+  <section id="about" style="margin-top:40px;">
+    <div class="panel">
+      <h2>About</h2>
+      <p>Hi, I’m Surbhi Suman — the creator of Solasaki Comics. I draw small, simple comics about everyday feelings, quiet joys, awkwardness, and the little existential chaos we all live with.</p>
+      <p>Through these tiny stories, I try to remind people that soft, silent moments also matter.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================
+       CONTACT
+       ============================================ -->
+  <section id="contact" style="margin-top:40px;">
+    <div class="panel">
+      <h2>Contact</h2>
+      <p>For collaborations or commissions, drop a message:</p>
+
+      <form onsubmit="event.preventDefault(); alert('Message sent!');">
+        <input placeholder="Your name" required>
+        <input type="email" placeholder="Your email" required>
+        <textarea placeholder="Your message" rows="4" required></textarea>
+        <button class="submit-btn">Send</button>
+      </form>
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; <span id="year"></span> Solasaki Comics. All rights reserved.
+  </footer>
+
+</div>
+
+  <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+
+  <!-- Instagram embed script -->
+  <script async src="https://www.instagram.com/embed.js"></script>
+
+  <script>
+  /* ============================================
+     YEAR IN FOOTER
+     ============================================ */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+
+  /* ============================================
+     THEME TOGGLE (Light / Dark + Auto)
+     ============================================ */
+  const root = document.documentElement;
+  const toggle = document.getElementById("themeToggle");
+
+  // Apply saved theme
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") root.classList.add("dark");
+  if (savedTheme === "light") root.classList.add("light");
+
+  // Update icon
+  function updateIcon() {
+    toggle.textContent = root.classList.contains("dark") ? "☀️" : "🌙";
+  }
+  updateIcon();
+
+  toggle.addEventListener("click", () => {
+    if (root.classList.contains("dark")) {
+      root.classList.remove("dark");
+      root.classList.add("light");
+      localStorage.setItem("theme", "light");
+    } else if (root.classList.contains("light")) {
+      root.classList.remove("light");
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+    updateIcon();
+  });
+
+
+  /* ============================================
+     LOAD DAILY WRITE-UPS (from GitHub)
+     ============================================ */
+  async function loadWritings() {
+    const container = document.getElementById("writeups-container");
+
+    try {
+      // GitHub API: list files in /writings folder
+      const apiURL = "https://api.github.com/repos/froggyinwonder/solasakicomics-site/contents/writings";
+
+      const res = await fetch(apiURL);
+      if (!res.ok) throw new Error("Cannot load list");
+
+      const files = await res.json();
+
+      // Filter only .md files
+      const mdFiles = files.filter(f => f.name.endsWith(".md"));
+
+      if (mdFiles.length === 0) {
+        container.innerHTML = "<p>No writings yet.</p>";
+        return;
+      }
+
+      // Sort newest → oldest using GitHub timestamps automatically
+      mdFiles.sort((a, b) => new Date(b.name) - new Date(a.name));
+
+      let htmlOutput = "";
+
+      for (const file of mdFiles) {
+        const mdRes = await fetch(file.download_url);
+        const text = await mdRes.text();
+
+        // Parse YAML frontmatter
+        const title = text.match(/title:\s*["']?(.*?)["']?\n/);
+        const date = text.match(/date:\s*["']?(.*?)["']?\n/);
+        const body = text.split("---").pop().trim();
+
+        htmlOutput += `
+          <div class="write-card">
+            <h3>${title ? title[1] : "Untitled"}</h3>
+            <p style="color:var(--muted);font-size:13px;">${date ? date[1] : ""}</p>
+            <p>${body.replace(/\n/g, "<br>")}</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = htmlOutput;
+
+    } catch (err) {
+      container.innerHTML = "<p>Could not load writings.</p>";
+    }
+  }
+
+  loadWritings();
+  </script>
+
+</body>
+</html>
