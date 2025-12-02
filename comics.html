@@ -2,13 +2,15 @@
 <html>
 <head>
   <title>Comics — Solasaki Comics</title>
-  <link rel="stylesheet" href="style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Elfsight MUST load in <head> on Vercel -->
+  <script src="https://elfsightcdn.com/platform.js" defer></script>
 </head>
 
 <body class="fade">
 
-<!-- HEADER -->
 <header>
   <div class="logoarea">
     <img src="assets/uploads/IMG_0079.jpeg">
@@ -24,46 +26,36 @@
   </nav>
 </header>
 
-<!-- ============================================
-     FULL-WIDTH SKETCHBOOK SPREAD
-============================================= -->
-<div class="sketchbook-spread">
+<!-- PAGE BODY -->
+<div class="page slide-up">
 
-  <!-- Title -->
-  <h2 class="section-title">Comics</h2>
+  <h2>Comics</h2>
 
-  <!-- Random Comic Button -->
-  <div class="random-area">
-    <button class="random-btn" onclick="scrollToRandom()">Random Comic</button>
-  </div>
+  <button class="random-btn" onclick="scrollToRandom()">Random Comic</button>
 
-  <!-- COMICS FEED AREA -->
-  <div class="comics-feed">
+  <!-- Clean container so Elfsight loads correctly -->
+  <div id="comics-feed" style="margin-top:20px;">
 
-    <!-- YOUR ELFSIGHT INSTAGRAM WIDGET -->
-    <!-- Elfsight Instagram Feed | Untitled Instagram Feed -->
-    <script src="https://elfsightcdn.com/platform.js" async></script>
-    <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3" data-elfsight-app-lazy></div>
+    <!-- Elfsight Widget -->
+    <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3"></div>
 
   </div>
+
 </div>
 
 <!-- FOOTER -->
 <footer>© 2025 Solasaki Comics</footer>
 
-<!-- RANDOM COMIC JS -->
 <script>
+/* Random comic scroll */
 function scrollToRandom() {
-  setTimeout(() => {
+  const tryScroll = () => {
     const posts = document.querySelectorAll(".eapps-instagram-feed-posts-item");
-    if (!posts.length) return;
-
-    const i = Math.floor(Math.random() * posts.length);
-    posts[i].scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }, 600);
+    if (posts.length === 0) return setTimeout(tryScroll, 300);
+    const random = Math.floor(Math.random() * posts.length);
+    posts[random].scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+  tryScroll();
 }
 </script>
 
