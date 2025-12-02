@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <title>Write-ups — Solasaki</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="fade">
+
+<header>
+  <div class="logoarea">
+    <img src="assets/uploads/IMG_0079.jpeg">
+    <h1>Solasaki Comics</h1>
+  </div>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a href="writeups.html">Write-ups</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="page">
+  <h2>Daily Write-ups</h2>
+
+  <div id="entries">Loading…</div>
+</div>
+
+<script>
+async function loadWritings() {
+  const container = document.getElementById("entries");
+
+  const api = "https://api.github.com/repos/froggyinwonder/solasakicomics-site/contents/writings";
+  let data = await fetch(api).then(r => r.json());
+  let files = data.filter(f => f.name.endsWith(".md"));
+
+  for (let f of files) {
+    let content = await fetch(f.download_url).then(r => r.text());
+    let parts = content.split("---");
+    let body = parts[2];
+
+    container.innerHTML += `
+      <div class="entry fade">
+        <h3>${f.name.replace(".md", "")}</h3>
+        <p>${body.replace(/\n/g,"<br>")}</p>
+      </div>
+    `;
+  }
+}
+loadWritings();
+</script>
+
+<footer>© 2025 Solasaki Comics</footer>
+
+</body>
+</html>
