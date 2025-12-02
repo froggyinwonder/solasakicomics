@@ -25,11 +25,14 @@
 <div class="page slide-up">
   <h2>Comics</h2>
 
+  <!-- Random Comic Button -->
   <button class="random-btn" onclick="scrollToRandom()">Random Comic</button>
 
+  <!-- Comics feed area -->
   <div class="comic-box" id="comics-area">
 
-    <!-- FINAL ELFSIGHT CODE (using your latest ID) -->
+    <!-- YOUR FINAL ELFSIGHT CODE -->
+    <!-- Elfsight Instagram Feed | Untitled Instagram Feed -->
     <script src="https://elfsightcdn.com/platform.js" async></script>
     <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3" data-elfsight-app-lazy></div>
 
@@ -37,13 +40,22 @@
 </div>
 
 <script>
-/* Works once the feed loads */
+/* Scroll to a random comic inside Elfsight feed */
+
 function scrollToRandom() {
-  const posts = document.querySelectorAll(".eapps-instagram-feed-posts-item");
-  if (!posts.length) return;
-  const i = Math.floor(Math.random() * posts.length);
-  posts[i].scrollIntoView({ behavior: "smooth", block: "center" });
+  // Elfsight loads asynchronously → wait just a moment
+  setTimeout(() => {
+    const posts = document.querySelectorAll(".eapps-instagram-feed-posts-item");
+    if (!posts.length) return;
+
+    const i = Math.floor(Math.random() * posts.length);
+    posts[i].scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }, 600);
 }
+
 </script>
 
 <footer>© 2025 Solasaki Comics</footer>
