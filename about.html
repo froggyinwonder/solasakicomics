@@ -22,12 +22,12 @@
   </nav>
 </header>
 
-<div class="page">
+<div class="page slide-up">
 
   <h2>About</h2>
 
   <p>Hello! I'm Surbhi — the creator behind Solasaki Comics.  
-  I make small comics inspired by weird observations.</p>
+  I make small, simple drawings and stories inspired by everyday life.</p>
 
   <h3 style="font-family:'Patrick Hand';margin-top:40px;">
     ✏️ Draw something for the artist… or for yourself!
@@ -48,12 +48,12 @@
 let canvas = document.getElementById("drawCanvas");
 let ctx = canvas.getContext("2d");
 
-function resize() {
+function resizeCanvas() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 }
-resize();
-window.onresize = resize;
+resizeCanvas();
+window.onresize = resizeCanvas;
 
 let drawing = false;
 
