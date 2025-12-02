@@ -1,9 +1,8 @@
 <!doctype html>
 <html>
 <head>
-  <title>Comics — Solasaki</title>
+  <title>Comics — Solasaki Comics</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://elfsightcdn.com/platform.js" async></script>
 </head>
 
 <body class="fade">
@@ -26,20 +25,28 @@
 <div class="page slide-up">
   <h2>Comics</h2>
 
+  <!-- Random Comic Button -->
   <button class="random-btn" onclick="scrollToRandom()">Random Comic</button>
 
+  <!-- Comics Box -->
   <div class="comic-box" id="comics-area">
-    <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3"></div>
+
+    <!-- NEW Elfsight Instagram Feed -->
+    <!-- Elfsight Instagram Feed | Solasaki Comics -->
+    <script src="https://elfsightcdn.com/platform.js" async></script>
+    <div class="elfsight-app-ac3334b7-1d89-495c-9f77-adf97d93bad3" data-elfsight-app-lazy></div>
+
   </div>
 </div>
 
 <script>
+/* Scroll to a random comic inside Elfsight feed */
 function scrollToRandom() {
-  const embeds = document.querySelectorAll(".eapps-instagram-feed-posts-item");
-  if (embeds.length === 0) return;
+  const posts = document.querySelectorAll(".eapps-instagram-feed-posts-item");
+  if (!posts || posts.length === 0) return;
 
-  const randomIndex = Math.floor(Math.random() * embeds.length);
-  embeds[randomIndex].scrollIntoView({ behavior: "smooth", block: "center" });
+  const i = Math.floor(Math.random() * posts.length);
+  posts[i].scrollIntoView({ behavior: "smooth", block: "center" });
 }
 </script>
 
