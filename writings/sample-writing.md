@@ -1,7 +1,6 @@
 ---
 title: "Welcome to Solasaki CMS"
-date: 2025-01-01
+date: 2025-12-01
 ---
 
-This is your first CMS-powered writing.  
-You can delete it anytime from the CMS dashboard.
+ I'll post something soon! You can read the comics for now!!
