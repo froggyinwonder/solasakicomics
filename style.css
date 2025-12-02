@@ -300,7 +300,41 @@ nav a:hover {
   border-radius: 8px;
   font-size: 16px;
 }
+/* ============================
+   DOODLE WALL — POLAROID STYLE
+   ============================ */
 
+.doodle-wall {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 14px;
+}
+
+.doodle-sticker {
+  width: 100%;
+  max-width: 120px;
+  background: white;
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+
+.doodle-sticker:hover {
+  transform: scale(1.05);
+}
+
+/* Sketchboard */
+.sketch-controls button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-family: "Patrick Hand";
+  border-radius: 8px;
+  font-size: 16px;
+}
 /* =======================================
    CONTACT FORM
    ======================================= */
