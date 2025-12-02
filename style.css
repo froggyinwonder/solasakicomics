@@ -438,3 +438,73 @@ footer {
   }
 
 }
+/* FULL-WIDTH SKETCHBOOK SPREAD */
+.sketchbook-spread {
+  width: 100%;
+  padding: 40px 0;
+  background: #faf7ef;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  mask-image: url('assets/uploads/torn-edge-mask.png');
+  mask-size: cover;
+  -webkit-mask-image: url('assets/uploads/torn-edge-mask.png');
+  -webkit-mask-size: cover;
+}
+
+/* Title */
+.section-title {
+  text-align: center;
+  font-family: "Patrick Hand";
+  font-size: 38px;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* Random Button */
+.random-area {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.random-btn {
+  background: var(--accent);
+  padding: 10px 22px;
+  border-radius: 12px;
+  color: white;
+  font-family: "Patrick Hand";
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.random-btn:hover { scale: 1.05; }
+
+/* Comics Feed */
+.comics-feed {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+/* 2-column mobile */
+@media (max-width: 768px) {
+  .eapps-instagram-feed-posts {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+/* 4-column desktop */
+@media (min-width: 769px) {
+  .eapps-instagram-feed-posts {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+  }
+  .eapps-instagram-feed-posts-item {
+    margin: 0 !important;
+  }
+}
