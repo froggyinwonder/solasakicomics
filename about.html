@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>About — Solasaki Comics</title>
+  <title>About — Solasaki</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -26,57 +26,150 @@
 
   <h2>About</h2>
 
-  <p>Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.  
-  I make simple comics inspired by my weird observations. 
-  You can also read my writeups if you have nothing better to do. </p>
+  <p>
+  Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.<br><br>
+  I make simple comics inspired by my weird observations.<br><br>
+  You can also read my writeups if you have nothing better to do.
+</p>
 
-  <h3 style="font-family:'Patrick Hand';margin-top:40px;">
+  <h3 style="font-family:'Patrick Hand'; margin-top:40px;">
     ✏️ Draw something for the artist… or for yourself!
   </h3>
 
+  <!-- Sketchboard -->
   <div class="sketchboard">
     <canvas id="drawCanvas"></canvas>
 
     <div class="sketch-controls">
+      <button onclick="startDrawing()">Start Drawing</button>
+      <button onclick="stopDrawing()">Stop</button>
       <button onclick="clearCanvas()">Clear</button>
-      <button onclick="toggleDraw()">Toggle Draw</button>
+      <button onclick="saveDoodle()">Save Doodle</button>
     </div>
   </div>
+
+  <!-- Doodle Wall -->
+  <h3 style="font-family:'Patrick Hand'; margin-top:40px;">Your Saved Doodles</h3>
+  <div id="doodleWall" class="doodle-wall"></div>
 
 </div>
 
 <script>
+/* ============================
+   INITIAL CANVAS SETUP
+   ============================ */
 let canvas = document.getElementById("drawCanvas");
 let ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
   canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.height = 300;
 }
 resizeCanvas();
-window.onresize = resizeCanvas;
+window.addEventListener("resize", resizeCanvas);
+
+/* Smooth pencil style */
+ctx.lineJoin = "round";
+ctx.lineCap = "round";
+ctx.lineWidth = 2;
+ctx.strokeStyle = "#1a1a1a";
 
 let drawing = false;
 
-canvas.addEventListener("pointerdown", () => drawing = true);
-canvas.addEventListener("pointerup", () => drawing = false);
-canvas.addEventListener("pointermove", draw);
-
-function draw(e) {
-  if (!drawing) return;
-  ctx.fillStyle = "#1a1a1a";
-  ctx.beginPath();
-  ctx.arc(e.offsetX, e.offsetY, 2, 0, Math.PI*2);
-  ctx.fill();
+/* Convert pointer positions for mobile */
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  if (e.touches) {
+    return {
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
+    };
+  } else {
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
 }
+
+/* Drawing logic */
+function pointerDown(e) {
+  drawing = true;
+  const pos = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+}
+
+function pointerMove(e) {
+  if (!drawing) return;
+  const pos = getPos(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+}
+
+function pointerUp() {
+  drawing = false;
+}
+
+/* Attach events */
+canvas.addEventListener("mousedown", pointerDown);
+canvas.addEventListener("mousemove", pointerMove);
+canvas.addEventListener("mouseup", pointerUp);
+
+canvas.addEventListener("touchstart", pointerDown);
+canvas.addEventListener("touchmove", pointerMove);
+canvas.addEventListener("touchend", pointerUp);
+
+/* Control buttons */
+function startDrawing() { drawing = true; }
+function stopDrawing() { drawing = false; }
 
 function clearCanvas() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function toggleDraw() {
-  drawing = !drawing;
+/* ============================
+   SAVE DOODLE
+   ============================ */
+function saveDoodle() {
+  const dataURL = canvas.toDataURL("image/png");
+
+  let doodles = JSON.parse(localStorage.getItem("sola_doodles") || "[]");
+
+  // Limit to 5 doodles
+  if (doodles.length >= 5) doodles.shift();
+
+  doodles.push(dataURL);
+  localStorage.setItem("sola_doodles", JSON.stringify(doodles));
+
+  renderDoodles();
+  clearCanvas();
 }
+
+/* ============================
+   RENDER DOODLES
+   ============================ */
+function renderDoodles() {
+  const wall = document.getElementById("doodleWall");
+  wall.innerHTML = "";
+
+  const doodles = JSON.parse(localStorage.getItem("sola_doodles") || "[]");
+
+  doodles.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "doodle-sticker";
+
+    // Random slight rotation
+    const angle = (Math.random() * 12 - 6).toFixed(1);
+    img.style.transform = `rotate(${angle}deg)`;
+
+    wall.appendChild(img);
+  });
+}
+
+/* Load on page start */
+renderDoodles();
 </script>
 
 <footer>© 2025 Solasaki Comics</footer>
