@@ -202,6 +202,32 @@ nav a:hover {
 .comic-tile {
   break-inside: avoid;
 }
+
+/* ============================================
+   ELFSIGHT CUSTOM COLUMN FIXES
+   ============================================ */
+
+/* MOBILE → 2 columns (Elfsight default is fine) */
+@media (max-width: 768px) {
+  .eapps-instagram-feed-posts {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+/* DESKTOP → FORCE 4 columns */
+@media (min-width: 769px) {
+  .eapps-instagram-feed-posts {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  /* Make items neat */
+  .eapps-instagram-feed-posts-item {
+    margin: 0 !important;
+  }
+}
 /* =======================================
    PAGE WRAPPER
    ======================================= */
