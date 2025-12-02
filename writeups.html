@@ -22,8 +22,12 @@
   </nav>
 </header>
 
-<div class="page">
+<div class="page slide-up">
   <h2>Daily Write-ups</h2>
+
+  <div class="searchbar">
+    <input id="searchInput" type="text" placeholder="Search write-ups...">
+  </div>
 
   <div id="entries">Loading…</div>
 </div>
@@ -36,19 +40,46 @@ async function loadWritings() {
   let data = await fetch(api).then(r => r.json());
   let files = data.filter(f => f.name.endsWith(".md"));
 
+  window.ALL_WRITES = [];
+
   for (let f of files) {
     let content = await fetch(f.download_url).then(r => r.text());
-    let parts = content.split("---");
-    let body = parts[2];
+    let body = content.split("---")[2];
 
+    const entry = {
+      title: f.name.replace(".md", ""),
+      content: body
+    };
+
+    ALL_WRITES.push(entry);
+  }
+
+  renderWrites(ALL_WRITES);
+}
+
+function renderWrites(list) {
+  const container = document.getElementById("entries");
+  container.innerHTML = "";
+
+  list.forEach(w => {
     container.innerHTML += `
       <div class="entry fade">
-        <h3>${f.name.replace(".md", "")}</h3>
-        <p>${body.replace(/\n/g,"<br>")}</p>
+        <h3>${w.title}</h3>
+        <p>${w.content.replace(/\n/g,"<br>")}</p>
       </div>
     `;
-  }
+  });
 }
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  const filtered = ALL_WRITES.filter(w =>
+    w.title.toLowerCase().includes(q) ||
+    w.content.toLowerCase().includes(q)
+  );
+  renderWrites(filtered);
+});
+
 loadWritings();
 </script>
 
