@@ -188,7 +188,20 @@ nav a:hover {
 .random-btn:hover {
   transform: translateY(-3px);
 }
+/* ============================================
+   BETTER COMICS GRID
+   ============================================ */
 
+.comics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* Images inside comics */
+.comic-tile {
+  break-inside: avoid;
+}
 /* =======================================
    PAGE WRAPPER
    ======================================= */
