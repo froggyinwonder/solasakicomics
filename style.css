@@ -344,3 +344,44 @@ footer {
     font-size: 16px;
   }
 }
+/* ============================================
+   MOBILE FIXES — DO NOT CHANGE DESKTOP LAYOUT
+   ============================================ */
+@media (max-width: 600px) {
+
+  /* Page padding */
+  .site {
+    padding: 12px;
+    margin: 0 auto;
+  }
+
+  /* Hero panel */
+  .hero-panel {
+    min-height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hero-panel img {
+    height: 220px;
+    object-fit: contain;  /* Important! Removes landscape stretch */
+  }
+
+  .hero-text {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 10px 14px;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+}
