@@ -205,3 +205,48 @@ header nav a {
 html, body {
   overflow-x: hidden !important;
 }
+/* ============================================================
+   🔧 GLOBAL FIXES — PUT AT THE VERY END OF style.css
+   These stop mobile overflow, fix header wrapping,
+   fix Instagram stretching, and improve desktop spacing.
+   ============================================================ */
+
+/* Prevent any element from forcing horizontal scrolling */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden !important;
+}
+
+/* Fix Instagram embeds causing layout break on Write-ups & Comics */
+.instagram-media {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+}
+
+/* FORCE header navigation to always stay on ONE line */
+header nav {
+  display: flex;
+  flex-wrap: nowrap !important;
+  white-space: nowrap;
+  gap: 12px;                 /* improves spacing */
+}
+
+/* Desktop spacing for header nav (web view) */
+@media (min-width: 801px) {
+  header nav {
+    gap: 28px !important;   /* more breathing room on large screens */
+  }
+}
+
+/* Ensure no page content pushes header sideways */
+.page,
+.page * {
+  max-width: 100% !important;
+}
