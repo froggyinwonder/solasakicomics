@@ -159,31 +159,41 @@ footer {
   margin-top: 40px;
 }
 
-/* MOBILE FIXES — RESTORED CLEAN */
+
+   /* NAVIGATION — FIXED FOR MOBILE */
+nav {
+  display: flex;
+  gap: 16px;
+  white-space: nowrap;      /* prevent wrapping */
+  overflow-x: auto;          /* enable horizontal scroll on small screens */
+  padding-bottom: 4px;
+  scrollbar-width: none;     /* hide scrollbar on Firefox */
+}
+
+nav::-webkit-scrollbar {
+  display: none;             /* hide scrollbar on Chrome/Safari */
+}
+
+nav a {
+  font-family: "Patrick Hand";
+  font-size: 18px;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 6px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;            /* IMPORTANT: keeps items same size, no shrinking */
+}
+
+nav a:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--accent);
+}
+
+/* MOBILE TWEAK */
 @media (max-width: 600px) {
-
-  nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
   nav a {
-    margin: 6px;
+    font-size: 17px;
+    padding: 4px 8px;
   }
-
-  .hero-banner {
-    height: 180px;
-  }
-
-  .hero-title {
-    font-size: 22px;
-    left: 12px;
-    bottom: 12px;
-    padding: 6px 10px;
-  }
-
-  .comic-rotator {
-    max-width: 310px;
-  }
+}
 }
