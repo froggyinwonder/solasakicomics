@@ -695,3 +695,58 @@ footer {
   :root { --site-side-pad: 10px; }
   .page { padding-left: var(--site-side-pad); padding-right: var(--site-side-pad); }
 }
+/* ============================
+   HERO WALLPAPER SECTION
+   ============================ */
+
+.hero-wallpaper {
+  width: 100%;
+  height: 260px;
+  background-image: url("assets/uploads/wallpaper-texture.jpg"); /* <-- put your wallpaper here */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-bottom: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.hero-overlay {
+  text-align: center;
+}
+
+.hero-doodle {
+  width: 140px;
+  opacity: 0.9;
+  filter: drop-shadow(0px 3px 6px rgba(0,0,0,0.2));
+  margin-bottom: 8px;
+}
+
+.hero-text {
+  font-family: "Patrick Hand";
+  font-size: 28px;
+  color: var(--ink);
+  background: rgba(255,255,255,0.8);
+  padding: 6px 14px;
+  border-radius: 10px;
+  display: inline-block;
+  border: 2px dashed var(--border);
+}
+
+/* MOBILE FIX */
+@media (max-width: 600px) {
+  .hero-wallpaper {
+    height: 220px;
+  }
+
+  .hero-doodle {
+    width: 110px;
+  }
+
+  .hero-text {
+    font-size: 22px;
+  }
+}
