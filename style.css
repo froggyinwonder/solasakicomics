@@ -295,3 +295,11 @@ header nav {
     max-width: 100%;
   }
 }
+/* Center the CONTACT heading */
+.contact-page-title {
+  text-align: center;
+  font-family: "Patrick Hand";
+  font-size: 32px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
