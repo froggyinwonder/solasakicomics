@@ -202,3 +202,51 @@ nav a:hover {
   }
 }
 }
+/* ============================
+   FINAL MOBILE HEADER FIX
+   ============================ */
+@media (max-width: 600px) {
+
+  /* Prevent sideways scrolling globally */
+  body, html {
+    overflow-x: hidden !important;
+  }
+
+  /* Header becomes stacked so nothing overflows */
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  /* Logo row centered & shrink image */
+  .logoarea {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logoarea img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .logoarea h1 {
+    font-size: 20px !important;
+  }
+
+  /* NAV WRAPS PROPERLY */
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  nav a {
+    font-size: 16px;
+    margin: 0 !important;
+  }
+}
