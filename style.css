@@ -699,116 +699,84 @@ footer {
    HERO WALLPAPER SECTION
    ============================ */
 /* =======================================
-   CLEAN PAPER HERO BANNER
-   ======================================= */
+/* ==============================
+   HERO WALLPAPER BANNER
+   ============================== */
 
-/* ========================================
-   HERO WALLPAPER — PREMIUM ART STYLE
-   ======================================== */
+.hero-banner {
+  width: 100%;
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 2px dashed var(--border);
+  background: var(--paper);
+}
 
-/* Full wallpaper hero */
+/* wallpaper full width */
 .hero-wallpaper {
   width: 100%;
-  height: 280px;
-  background-image: url("assets/uploads/wallpaper-soft.jpg"); /* your wallpaper */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  border-bottom: 3px dashed var(--border);
-  overflow: visible;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 1;
 }
 
-/* Left vertical colored bar (Saatchi style) */
-.left-accent {
+/* left doodle + right heading wrapper */
+.hero-content {
   position: absolute;
+  top: 50%;
   left: 0;
-  top: 0;
-  width: 16%;
-  height: 100%;
-  background: #f3e29d;
-  border-right: 3px dashed var(--border);
-}
-
-/* Container inside wallpaper */
-.hero-inner {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  height: 100%;
+  transform: translateY(-50%);
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
+  align-items: center;
   padding-left: 20px;
+  padding-right: 20px;
 }
 
-/* Doodle circle (half in / half out) */
-.hero-doodle-circle {
-  width: 160px;
-  height: 160px;
+/* doodle image in circle */
+.hero-doodle {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   border: 3px dashed var(--border);
   background: white;
-  padding: 8px;
-
-  /* overlap */
-  position: relative;
-  top: 70px;
-
-  /* soft shadow */
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-
-  /* floating animation */
-  animation: floaty 4s ease-in-out infinite alternate;
+  object-fit: cover;
+  margin-right: 20px;
+  transform: translateY(20px); /* half-outside effect */
 }
 
-/* floating animation */
-@keyframes floaty {
-  from { transform: translateY(0px); }
-  to   { transform: translateY(-6px); }
-}
-
-/* Title below doodle */
-.hero-title-below {
-  margin-top: 90px;
-  width: 90%;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+/* heading on the right */
+.hero-heading {
   font-family: "Patrick Hand";
   font-size: 32px;
-  text-align: left;
-
-  /* hand-drawn bubble style */
-  background: #fffef8;
-  padding: 8px 16px;
-  border: 3px dashed var(--border);
-  border-radius: 14px;
-  display: inline-block;
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.85);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  max-width: 70%;
 }
 
-
-/* ======================
-   MOBILE FRIENDLY
-   ====================== */
-
+/* MOBILE FRIENDLY */
 @media (max-width: 600px) {
-
-  .hero-wallpaper {
-    height: 220px;
+  .hero-banner {
+    height: 180px;
   }
 
-  .left-accent {
-    width: 22%;
+  .hero-doodle {
+    width: 95px;
+    height: 95px;
+    margin-right: 12px;
+    transform: translateY(10px);
   }
 
-  .hero-doodle-circle {
-    width: 130px;
-    height: 130px;
-    top: 60px;
+  .hero-heading {
+    font-size: 22px;
+    max-width: 60%;
   }
 
-  .hero-title-below {
-    font-size: 26px;
-    margin-top: 70px;
+  .hero-content {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
