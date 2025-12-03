@@ -1,13 +1,10 @@
 /* =======================================
-   GLOBAL SKETCHBOOK THEME — SOLASAKI COMICS
-   ======================================= */
+   GLOBAL SKETCHBOOK THEME — RESTORED CLEAN VERSION
+======================================= */
 
 /* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Patrick+Hand&display=swap');
 
-/* ---------------------------------------
-   ROOT VARIABLES (DAY MODE)
------------------------------------------ */
 :root {
   --paper: #fffdf7;
   --ink: #1b1b1b;
@@ -15,60 +12,30 @@
   --accent: #b88fbf;
   --border: rgba(0,0,0,0.16);
   --shadow: rgba(0,0,0,0.06);
-  --hero-overlay-bg: rgba(255,255,255,0.95);
-
-  --transition-speed: 0.3s;
 }
 
-/* ---------------------------------------
-   NIGHT MODE VARIABLES
------------------------------------------ */
-body.night {
-  --paper: #1a1a1a;
-  --ink: #f0f0f0;
-  --muted: #bbbbbb;
-  --accent: #d29ee5;
-  --border: rgba(255,255,255,0.18);
-  --shadow: rgba(255,255,255,0.06);
-  --hero-overlay-bg: rgba(0,0,0,0.75);
-}
-
-/* Smooth transitions for night toggle */
-body, header, .comic-title-box, .entry, .hero-heading {
-  transition: background var(--transition-speed), color var(--transition-speed), border var(--transition-speed);
-}
-
-/* =======================================
-   GLOBAL RESET
-   ======================================= */
+/* GLOBAL RESET */
 body, html {
   margin: 0;
   padding: 0;
-  font-family: "Inter", sans-serif;
   background: var(--paper);
   color: var(--ink);
+  font-family: "Inter", sans-serif;
   overflow-x: hidden;
 }
 
-/* =======================================
-   HEADER
-   ======================================= */
-
+/* HEADER — RESTORED */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
   border-bottom: 2px dashed var(--border);
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.9);
   backdrop-filter: blur(6px);
   position: sticky;
   top: 0;
   z-index: 100;
-}
-
-body.night header {
-  background: rgba(0,0,0,0.4);
 }
 
 .logoarea {
@@ -86,131 +53,87 @@ body.night header {
 
 .logoarea h1 {
   font-family: "Patrick Hand";
-  font-size: clamp(20px, 4vw, 26px);
+  font-size: 26px;
   margin: 0;
 }
 
 nav a {
   font-family: "Patrick Hand";
   font-size: 18px;
-  margin-left: 14px;
-  text-decoration: none;
+  margin-left: 16px;
   color: var(--ink);
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 6px;
 }
 
 nav a:hover {
+  background: rgba(0,0,0,0.05);
   color: var(--accent);
 }
 
-/* =======================================
-   NIGHT MODE TOGGLE BUTTON
-   ======================================= */
-
-.toggle-mode {
-  margin-left: 14px;
-  padding: 6px 12px;
-  font-family: "Patrick Hand";
-  border-radius: 10px;
-  border: 2px dashed var(--border);
-  background: var(--paper);
-  color: var(--ink);
-  cursor: pointer;
-  transition: var(--transition-speed);
-}
-body.night .toggle-mode {
-  background: #2a2a2a;
-}
-
-/* =======================================
-   HERO BANNER (FIXED FINAL)
-   ======================================= */
+/* =============================
+   RESTORED HERO WALLPAPER
+============================= */
 
 .hero-banner {
-  position: relative;
   width: 100%;
-  height: 260px;
+  height: 240px;
+  position: relative;
   overflow: hidden;
   border-bottom: 2px dashed var(--border);
-  background: var(--paper);
 }
 
-/* Wallpaper full width */
-.hero-banner .hero-wallpaper {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Sleeping doodle left-bottom half outside */
-.hero-banner .hero-doodle {
+/* Wallpaper full-width background */
+.hero-banner::before {
+  content: "";
   position: absolute;
-  bottom: -35px;
+  inset: 0;
+  background-image: url("assets/uploads/wallpaper-soft.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+}
+
+/* TEXT — left side */
+.hero-title {
+  position: absolute;
   left: 20px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  border: 3px dashed var(--border);
-  object-fit: cover;
-  background: white;
-  z-index: 5;
-}
+  bottom: 20px;
 
-/* Heading beside doodle, outside wallpaper */
-.hero-banner .hero-heading {
-  position: absolute;
-  bottom: -65px;
-  left: 170px;
   font-family: "Patrick Hand";
-  font-size: 28px;
-  padding: 10px 18px;
-  background: var(--hero-overlay-bg);
+  font-size: 34px;
+  background: rgba(255,255,255,0.85);
   border: 2px dashed var(--border);
+  padding: 10px 16px;
   border-radius: 12px;
-  white-space: nowrap;
 }
 
-@media (max-width: 600px) {
-  .hero-banner {
-    height: 200px;
-  }
-
-  .hero-banner .hero-doodle {
-    width: 80px;
-    height: 80px;
-    bottom: -20px;
-  }
-
-  .hero-banner .hero-heading {
-    bottom: -50px;
-    left: 115px;
-    font-size: 20px;
-  }
-}
-
-/* =======================================
+/* ============================
    COMIC ROTATOR
-   ======================================= */
+============================ */
 
 .comic-rotator-wrapper {
   text-align: center;
-  margin-top: 90px; /* space because hero-heading is pulled out */
+  padding: 20px;
+  margin-top: 20px;
 }
 
 .comic-title-box {
   font-family: "Patrick Hand";
   font-size: 22px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border: 2px dashed var(--border);
-  background: var(--paper);
-  display: inline-block;
+  background: #fffef9;
   border-radius: 10px;
-  margin-bottom: 14px;
+  display: inline-block;
+  margin-bottom: 10px;
 }
 
 .comic-rotator {
-  max-width: 340px;
-  margin: auto;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
 .comic-frame {
@@ -222,113 +145,45 @@ body.night .toggle-mode {
 }
 
 blockquote.instagram-media {
-  margin: 0 auto !important;
   width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
 }
 
-/* =======================================
-   WRITEUPS / ABOUT / DOODLE WALL — SAME AS BEFORE
-   (Your provided code kept exactly as-is)
-   ======================================= */
-
-.entry {
-  background: var(--paper);
-  border: 2px dashed var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 18px;
-  box-shadow: 0 8px 20px var(--shadow);
-  -webkit-mask-image: url('assets/uploads/torn-edge-mask.png');
-  mask-image: url('assets/uploads/torn-edge-mask.png');
-  mask-size: cover;
-  -webkit-mask-size: cover;
-}
-
-/* (Other sections unchanged — to keep message short) */
-/* ---------------------------------------
-   FIXED HERO BANNER — FINAL VERSION
------------------------------------------ */
-
-.hero-banner {
-  position: relative;
-  width: 100%;
-  height: 230px;
-  overflow: hidden;
-  border-bottom: 2px dashed var(--border);
-  background: var(--paper);
-}
-
-/* wallpaper full width */
-.hero-wallpaper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* doodle circle — half outside bottom-left */
-.hero-doodle {
-  position: absolute;
-  bottom: -35px;    /* half outside */
-  left: 22px;
-
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 3px dashed var(--border);
-  background: white;
-  object-fit: cover;
-
-  z-index: 3;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.10);
-}
-
-/* centered heading below wallpaper */
-.hero-heading {
-  position: relative;
-  margin-top: 60px;   /* pushes it below wallpaper cleanly */
-  text-align: center;
-
-  font-family: "Patrick Hand";
-  font-size: 28px;
-  background: white;
-  border: 2px dashed var(--border);
-  padding: 8px 16px;
-  display: inline-block;
-  border-radius: 12px;
-}
-
-/* ---------------------------------------
-   MOBILE FIX
------------------------------------------ */
-@media (max-width: 600px) {
-  .hero-banner {
-    height: 180px;
-  }
-
-  .hero-doodle {
-    width: 80px;
-    height: 80px;
-    bottom: -28px;
-    left: 14px;
-  }
-
-  .hero-heading {
-    margin-top: 45px;
-    font-size: 20px;
-    padding: 6px 14px;
-  }
-}
-/* =======================================
-   FOOTER
-   ======================================= */
-
+/* FOOTER */
 footer {
   text-align: center;
   padding: 30px 0;
   color: var(--muted);
   font-size: 14px;
+  margin-top: 40px;
+}
+
+/* MOBILE FIXES — RESTORED CLEAN */
+@media (max-width: 600px) {
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  nav a {
+    margin: 6px;
+  }
+
+  .hero-banner {
+    height: 180px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+    left: 12px;
+    bottom: 12px;
+    padding: 6px 10px;
+  }
+
+  .comic-rotator {
+    max-width: 310px;
+  }
 }
