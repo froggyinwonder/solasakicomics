@@ -1,15 +1,17 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <title>About — Solasaki</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About — Solasaki Comics</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body class="fade">
 
 <header>
   <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
+    <img src="assets/uploads/IMG_0079.jpeg" style="width:48px;height:48px;border-radius:12px;object-fit:cover;">
     <h1>Solasaki Comics</h1>
   </div>
 
@@ -17,162 +19,226 @@
     <a href="index.html">Home</a>
     <a href="comics.html">Comics</a>
     <a href="writeups.html">Write-ups</a>
-    <a href="about.html">About</a>
+    <a href="about.html" class="active">About</a>
     <a href="contact.html">Contact</a>
   </nav>
 </header>
 
-<div class="page slide-up">
+
+<div class="page slide-up" style="max-width:900px;margin:auto;padding:20px;">
 
   <h2>About</h2>
 
   <p>
-  Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.<br><br>
-  I make simple comics inspired by my weird observations.<br><br>
-  You can also read my writeups if you have nothing better to do.
-</p>
+    Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.<br>
+    I make simple comics inspired by my weird observations.<br>
+    You can also read my writeups if you have nothing better to do.
+  </p>
 
-  <h3 style="font-family:'Patrick Hand'; margin-top:40px;">
-    ✏️ Draw something for the artist… or for yourself!
-  </h3>
 
-  <!-- Sketchboard -->
-  <div class="sketchboard">
-    <canvas id="drawCanvas"></canvas>
+  <!-- =======================================================
+       SKETCHPAD + PUBLIC DOODLES
+       ======================================================= -->
+  <div class="sketch-wrapper">
+    <h3>Draw something for the lazy artist ✏️</h3>
 
-    <div class="sketch-controls">
-      <button onclick="startDrawing()">Start Drawing</button>
-      <button onclick="stopDrawing()">Stop</button>
-      <button onclick="clearCanvas()">Clear</button>
-      <button onclick="saveDoodle()">Save Doodle</button>
-    </div>
+    <canvas id="sketchCanvas"></canvas>
+
+    <button id="saveDoodle">Save Doodle</button>
+
+    <p style="color:var(--muted);font-size:12px;margin-top:6px;">
+      Your doodle will become a tiny Post-it & appear for everyone ✨
+    </p>
+
+    <div id="doodleWall"></div>
   </div>
-
-  <!-- Doodle Wall -->
-  <h3 style="font-family:'Patrick Hand'; margin-top:40px;">Your Saved Doodles</h3>
-  <div id="doodleWall" class="doodle-wall"></div>
 
 </div>
 
+
+<footer>© <span id="year"></span> Solasaki Comics</footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+
+<!-- =======================================================
+     SKETCHPAD + DOODLE WALL SCRIPT
+     ======================================================= -->
 <script>
-/* ============================
-   INITIAL CANVAS SETUP
-   ============================ */
-let canvas = document.getElementById("drawCanvas");
-let ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = 300;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-/* Smooth pencil style */
-ctx.lineJoin = "round";
+// CANVAS SETUP
+const canvas = document.getElementById("sketchCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 300;
+canvas.height = 300;
+ctx.lineWidth = 3;
 ctx.lineCap = "round";
-ctx.lineWidth = 2;
-ctx.strokeStyle = "#1a1a1a";
+ctx.strokeStyle = "#000";
 
+// DRAWING LOGIC
 let drawing = false;
 
-/* Convert pointer positions for mobile */
 function getPos(e) {
-  const rect = canvas.getBoundingClientRect();
+  const r = canvas.getBoundingClientRect();
   if (e.touches) {
     return {
-      x: e.touches[0].clientX - rect.left,
-      y: e.touches[0].clientY - rect.top
-    };
-  } else {
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: e.touches[0].clientX - r.left,
+      y: e.touches[0].clientY - r.top
     };
   }
+  return {
+    x: e.clientX - r.left,
+    y: e.clientY - r.top
+  };
 }
 
-/* Drawing logic */
-function pointerDown(e) {
+canvas.addEventListener("mousedown", e => {
   drawing = true;
-  const pos = getPos(e);
+  const p = getPos(e);
   ctx.beginPath();
-  ctx.moveTo(pos.x, pos.y);
-}
+  ctx.moveTo(p.x, p.y);
+});
 
-function pointerMove(e) {
+canvas.addEventListener("mousemove", e => {
   if (!drawing) return;
-  const pos = getPos(e);
-  ctx.lineTo(pos.x, pos.y);
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y);
   ctx.stroke();
-}
+});
 
-function pointerUp() {
-  drawing = false;
-}
+canvas.addEventListener("mouseup", () => drawing = false);
+canvas.addEventListener("mouseleave", () => drawing = false);
 
-/* Attach events */
-canvas.addEventListener("mousedown", pointerDown);
-canvas.addEventListener("mousemove", pointerMove);
-canvas.addEventListener("mouseup", pointerUp);
+// TOUCH
+canvas.addEventListener("touchstart", e => {
+  drawing = true;
+  const p = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+});
 
-canvas.addEventListener("touchstart", pointerDown);
-canvas.addEventListener("touchmove", pointerMove);
-canvas.addEventListener("touchend", pointerUp);
+canvas.addEventListener("touchmove", e => {
+  if (!drawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  e.preventDefault();
+});
 
-/* Control buttons */
-function startDrawing() { drawing = true; }
-function stopDrawing() { drawing = false; }
+canvas.addEventListener("touchend", () => drawing = false);
 
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
 
-/* ============================
-   SAVE DOODLE
-   ============================ */
-function saveDoodle() {
-  const dataURL = canvas.toDataURL("image/png");
+// SAVE DOODLE
+document.getElementById("saveDoodle").onclick = async () => {
+  const imageBase64 = canvas.toDataURL("image/png");
 
-  let doodles = JSON.parse(localStorage.getItem("sola_doodles") || "[]");
+  const res = await fetch("/api/save-doodle", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ imageBase64 })
+  });
 
-  // Limit to 5 doodles
-  if (doodles.length >= 5) doodles.shift();
+  const json = await res.json();
 
-  doodles.push(dataURL);
-  localStorage.setItem("sola_doodles", JSON.stringify(doodles));
+  if (json.url) {
+    addDoodle(json.url);
+    alert("Doodle saved!");
+  }
+};
 
-  renderDoodles();
-  clearCanvas();
-}
 
-/* ============================
-   RENDER DOODLES
-   ============================ */
-function renderDoodles() {
+// LOAD DOODLES FROM SERVER
+async function loadDoodles() {
+  const res = await fetch("/api/list-doodles");
+  const data = await res.json();
+
   const wall = document.getElementById("doodleWall");
   wall.innerHTML = "";
 
-  const doodles = JSON.parse(localStorage.getItem("sola_doodles") || "[]");
-
-  doodles.forEach(src => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = "doodle-sticker";
-
-    // Random slight rotation
-    const angle = (Math.random() * 12 - 6).toFixed(1);
-    img.style.transform = `rotate(${angle}deg)`;
-
-    wall.appendChild(img);
-  });
+  data.doodles.forEach(url => addDoodle(url));
 }
 
-/* Load on page start */
-renderDoodles();
+// AUTO-REFRESH EVERY 10s
+setInterval(loadDoodles, 10000);
+loadDoodles();
+
+
+// POST-IT STYLE RANDOM DOODLE
+function addDoodle(url) {
+  const wall = document.getElementById("doodleWall");
+  const d = document.createElement("img");
+  d.src = url;
+
+  d.className = "postIt";
+
+  // random rotation
+  d.style.transform = `rotate(${(Math.random()*14)-7}deg)`;
+
+  // pastel backgrounds
+  const colors = ["#fffbc8", "#fff4e6", "#e9ffd8", "#e8f5ff"];
+  d.style.background = colors[Math.floor(Math.random()*colors.length)];
+
+  // random position
+  d.style.left = Math.random()*80 + "%";
+  d.style.top = Math.random()*80 + "%";
+
+  wall.appendChild(d);
+}
 </script>
 
-<footer>© 2025 Solasaki Comics</footer>
+
+<!-- =======================================================
+     CSS for Sketchpad & Post-its
+     ======================================================= -->
+<style>
+.sketch-wrapper {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
+
+#sketchCanvas {
+  display: block;
+  margin: 12px auto;
+  border: 2px solid var(--border);
+  background: #fff8d5;
+  border-radius: 12px;
+  touch-action: none;
+}
+
+#saveDoodle {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  margin: 10px auto;
+}
+
+#doodleWall {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  margin-top: 25px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+/* Small Post-it doodles */
+.postIt {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  padding: 6px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  object-fit: cover;
+}
+</style>
 
 </body>
 </html>
