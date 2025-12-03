@@ -177,3 +177,23 @@ footer {
   padding: 30px 0;
   color: var(--muted);
 }
+/* Prevent menu wrapping on mobile inside pages */
+header nav {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+
+header nav a {
+  white-space: nowrap;
+}
+/* Desktop menu spacing */
+@media (min-width: 801px) {
+  header nav {
+    gap: 26px;    /* Increase spacing between menu items */
+  }
+
+  header nav a {
+    font-size: 20px;  /* Optional: slightly bigger for desktop */
+  }
+}
