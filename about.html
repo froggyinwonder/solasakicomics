@@ -1,288 +1,280 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About — Solasaki Comics</title>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  <!-- main site CSS (your existing style.css) -->
-  <link rel="stylesheet" href="style.css">
-  <!-- small local style fixes so canvas matches your theme -->
-  <style>
-    /* ensure canvas matches your CSS sizing */
-    .page { max-width:900px; margin:auto; padding:22px; }
-    .sketch-wrapper { margin-top:22px; padding:14px; border:2px dashed var(--border); background:#fffef9; border-radius:12px; }
-    #sketchCanvas { width:100%; height:320px; display:block; border-radius:8px; background:#fffdf7; touch-action:none; }
-    .sketch-controls { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .sketch-controls button { padding:8px 14px; background:var(--accent); color:white; border:none; border-radius:8px; font-family:"Patrick Hand"; font-size:16px; cursor:pointer; }
-    .tool-secondary { background:#fff; color:#333; border:1px solid var(--border); }
-    .small-muted { color:var(--muted); font-size:14px; margin-left:8px; }
-  </style>
-</head>
-<body class="fade">
+  // === SUPABASE (your project & anon key) ===
+  const supabase = createClient(
+    "https://rgxtvwnfqglsxnmvkkus.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJneHR2d25mcWdsc3hubXZra3VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjEwNzksImV4cCI6MjA4MDMzNzA3OX0.twtdhIMF4xnaBQsird8CyEb3g3Kh8bI5REChohdyGwo"
+  );
 
-  <!-- Header (matches style.css .logoarea + nav) -->
-  <header>
-    <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
-      <h1>Solasaki Comics</h1>
-    </div>
+  // === Canvas setup ===
+  const canvas = document.getElementById('sketchCanvas');
+  const ctx = canvas.getContext('2d');
 
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a href="writeups.html">Write-ups</a>
-      <a class="active" href="#">About</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </header>
+  // Keep track of last devicePixelRatio used so we can reset scale cleanly
+  let lastRatio = 1;
 
-  <!-- Page content uses .page (style.css expects it) -->
-  <div class="page slide-up">
-    <h2>About</h2>
+  function fitCanvasToDisplay() {
+    // compute ratio and set backing store size (avoid repeated ctx.scale calls)
+    const ratio = window.devicePixelRatio || 1;
 
-    <p>Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.
-       I make simple comics inspired by my weird observations. You can also read my writeups if you have nothing better to do.</p>
+    // Save current strokes as-is, then resize and redraw
+    // Reset any transform so scale doesn't accumulate
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    <h3>Draw something for the artist or for yourself!!</h3>
+    // Set canvas internal pixel size for crisp rendering
+    canvas.width = Math.floor(canvas.clientWidth * ratio);
+    canvas.height = Math.floor(canvas.clientHeight * ratio);
 
-    <!-- Sketch area uses the same class names your CSS has -->
-    <div class="sketch-wrapper">
-      <canvas id="sketchCanvas"></canvas>
+    // Scale context to map CSS pixels -> backing pixels
+    ctx.scale(ratio, ratio);
 
-      <div class="sketch-controls" role="toolbar" aria-label="Sketch tools">
-        <button id="pencilBtn">✏️ Pencil</button>
-        <button id="eraserBtn" class="tool-secondary">🧽 Eraser</button>
-        <button id="undoBtn" class="tool-secondary">↩️ Undo</button>
-        <button id="clearBtn" class="tool-secondary">🧹 Clear</button>
-        <button id="saveDoodle">Save Doodle</button>
-        <span id="saveMsg" class="small-muted" aria-live="polite"></span>
-      </div>
+    // Apply common drawing defaults (line cap/join)
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
 
-      <div id="doodleWall" aria-hidden="false"></div>
-    </div>
+    lastRatio = ratio;
 
-    <section class="entry" style="margin-top:18px">
-      <h3>Visitors’ doodles</h3>
-      <div id="doodleGrid" class="doodle-wall"></div>
-    </section>
-  </div>
+    // redraw strokes at CSS coordinate space (strokes store CSS coords)
+    redrawAll();
+  }
 
-  <footer>
-    <p>© 2025 Solasaki Comics</p>
-  </footer>
+  // ensure initial sizing after CSS applied
+  requestAnimationFrame(fitCanvasToDisplay);
+  window.addEventListener('resize', () => {
+    // debounce a bit for smoother resizing on mobile
+    clearTimeout(window._fitTimeout);
+    window._fitTimeout = setTimeout(fitCanvasToDisplay, 80);
+  });
 
-  <!-- Script: Supabase + Canvas drawing -->
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  // drawing state
+  let drawing = false;
+  let erasing = false;
+  let currentStroke = [];
+  const strokes = []; // each stroke is an array of {x,y,erasing}
 
-    // === SUPABASE (your project & anon key) ===
-    const supabase = createClient(
-      "https://rgxtvwnfqglsxnmvkkus.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJneHR2d25mcWdsc3hubXZra3VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjEwNzksImV4cCI6MjA4MDMzNzA3OX0.twtdhIMF4xnaBQsird8CyEb3g3Kh8bI5REChohdyGwo"
-    );
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches && e.touches[0];
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
 
-    // === Canvas setup ===
-    const canvas = document.getElementById('sketchCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function fitCanvasToDisplay() {
-      // set internal pixel size for crisp lines on high-DPI
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(canvas.clientWidth * ratio);
-      canvas.height = Math.floor(canvas.clientHeight * ratio);
-      ctx.scale(ratio, ratio);
-      ctx.lineCap = 'round';
-      redrawAll();
+  function start(e) {
+    // pointer events/browsers may send right-clicks etc — only left-button or touch
+    if (e.pointerType === 'mouse' && e.buttons && (e.buttons & 1) === 0) return;
+    e.preventDefault();
+    drawing = true;
+    currentStroke = [];
+    const p = getPos(e);
+    currentStroke.push({ ...p, erasing });
+    // capture pointer to continue receiving events even if pointer leaves canvas
+    if (e.pointerId && canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     }
+  }
 
-    fitCanvasToDisplay();
-    window.addEventListener('resize', ()=> {
-      // preserve strokes when resizing by saving/ restoring pixel buffer
-      // simple approach: re-render from strokes after resize
-      fitCanvasToDisplay();
-    });
+  function move(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    currentStroke.push({ ...p, erasing });
 
-    // drawing state
-    let drawing=false;
-    let erasing=false;
-    let currentStroke=[];
-    const strokes=[]; // array of strokes; each stroke is list of {x,y,erase}
-
-    function getPos(e){
-      const rect = canvas.getBoundingClientRect();
-      const touch = e.touches && e.touches[0];
-      const clientX = touch ? touch.clientX : e.clientX;
-      const clientY = touch ? touch.clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    function start(e){
-      e.preventDefault();
-      drawing=true;
-      currentStroke=[];
-      const p=getPos(e);
-      currentStroke.push({...p, erasing});
-    }
-    function move(e){
-      if(!drawing) return;
-      e.preventDefault();
-      const p=getPos(e);
-      currentStroke.push({...p, erasing});
-      // draw last segment
-      const last = currentStroke[currentStroke.length-2];
+    // Draw the last segment(s) as they come in
+    // If this is the first segment there will be two points (index 0 & 1)
+    if (currentStroke.length >= 2) {
+      const a = currentStroke[currentStroke.length - 2];
+      const b = currentStroke[currentStroke.length - 1];
       ctx.beginPath();
-      ctx.lineWidth = erasing?18:3;
-      ctx.strokeStyle = erasing? getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7' : '#000';
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(p.x, p.y);
+      ctx.lineWidth = a.erasing ? 18 : 3;
+      ctx.strokeStyle = a.erasing
+        ? (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7').trim()
+        : '#000';
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    } else {
+      // single-point fallback (draw a dot)
+      const a = currentStroke[0];
+      ctx.beginPath();
+      ctx.lineWidth = a.erasing ? 18 : 3;
+      ctx.strokeStyle = a.erasing
+        ? (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7').trim()
+        : '#000';
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(a.x + 0.01, a.y + 0.01);
       ctx.stroke();
     }
-    function stop(e){
-      if(!drawing) return;
-      drawing=false;
-      if(currentStroke.length) strokes.push(currentStroke.slice());
-      currentStroke=[];
+  }
+
+  function stop(e) {
+    if (!drawing) return;
+    drawing = false;
+    if (currentStroke.length) strokes.push(currentStroke.slice());
+    currentStroke = [];
+    // release pointer capture
+    if (e && e.pointerId && canvas.releasePointerCapture) {
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     }
+  }
 
-    // pointer events + touch support
-    canvas.addEventListener('pointerdown', start);
-    canvas.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', stop);
+  // pointer + touch binding (pointer handles mouse/touch/stylus in modern browsers)
+  canvas.addEventListener('pointerdown', start);
+  canvas.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', stop);
 
-    // older touch fallback (rare)
-    canvas.addEventListener('touchstart', start, {passive:false});
-    canvas.addEventListener('touchmove', move, {passive:false});
-    canvas.addEventListener('touchend', stop);
+  // fallback for touch-only older browsers (passive:false to allow preventDefault)
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', stop);
 
-    function redrawAll(){
-      // clear (use css size values)
-      ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
-      for(const stroke of strokes){
-        for(let i=1;i<stroke.length;i++){
-          const a = stroke[i-1], b = stroke[i];
-          ctx.beginPath();
-          ctx.lineWidth = a.erasing?18:3;
-          ctx.strokeStyle = a.erasing? (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7') : '#000';
-          ctx.moveTo(a.x,a.y);
-          ctx.lineTo(b.x,b.y);
-          ctx.stroke();
-        }
+  function redrawAll() {
+    // clear using CSS size (not backing store)
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+    for (const stroke of strokes) {
+      if (!stroke || stroke.length < 1) continue;
+      for (let i = 1; i < stroke.length; i += 1) {
+        const a = stroke[i - 1], b = stroke[i];
+        ctx.beginPath();
+        ctx.lineWidth = a.erasing ? 18 : 3;
+        ctx.strokeStyle = a.erasing
+          ? (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7').trim()
+          : '#000';
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+      // If a stroke only had one point, draw a dot
+      if (stroke.length === 1) {
+        const a = stroke[0];
+        ctx.beginPath();
+        ctx.lineWidth = a.erasing ? 18 : 3;
+        ctx.strokeStyle = a.erasing
+          ? (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7').trim()
+          : '#000';
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(a.x + 0.01, a.y + 0.01);
+        ctx.stroke();
       }
     }
+  }
 
-    // tools
-    document.getElementById('pencilBtn').addEventListener('click', ()=> { erasing=false; });
-    document.getElementById('eraserBtn').addEventListener('click', ()=> { erasing=true; });
-    document.getElementById('undoBtn').addEventListener('click', ()=>{
-      strokes.pop();
-      redrawAll();
+  // Tools
+  document.getElementById('pencilBtn').addEventListener('click', () => { erasing = false; });
+  document.getElementById('eraserBtn').addEventListener('click', () => { erasing = true; });
+  document.getElementById('undoBtn').addEventListener('click', () => {
+    strokes.pop();
+    redrawAll();
+  });
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    strokes.length = 0;
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+  });
+
+  // friendly save messages (your list)
+  const messages = [
+    "That one is actually pretty!",
+    "Artist appreciates this one ❤️",
+    "Ahhh… try better maybe?",
+    "World has never seen such an artist (please never draw again).",
+    "The moon criticises this doodle.",
+    "This doodle has strong 'why though?' energy.",
+    "Beautiful. No one will understand it, ever.",
+    "This belongs in a museum. A very small one.",
+    "Even Yellow criticizes this one."
+  ];
+  function randomMsg() { return messages[Math.floor(Math.random() * messages.length)]; }
+
+  // client-side bucket limit enforcement: delete oldest until under limit
+  async function ensureBucketLimit(bucket = 'doodles', limitBytes = 50 * 1024 * 1024) {
+    const { data: list, error } = await supabase.storage.from(bucket).list('', {
+      limit: 1000,
+      sortBy: { column: 'created_at', order: 'asc' }
     });
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      strokes.length = 0;
-      ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
+    if (error || !list) return;
+    let total = list.reduce((s, f) => s + (f.size || 0), 0);
+    while (total > limitBytes && list.length) {
+      const oldest = list.shift();
+      if (!oldest) break;
+      await supabase.storage.from(bucket).remove([oldest.name]).catch(() => {});
+      total -= (oldest.size || 0);
+    }
+  }
+
+  // Export current canvas to blob (rasterize)
+  async function saveCanvasToBlob() {
+    // create an offscreen canvas sized to CSS width/height (no DPR scaling here)
+    const out = document.createElement('canvas');
+    out.width = canvas.clientWidth;
+    out.height = canvas.clientHeight;
+    const outCtx = out.getContext('2d');
+
+    // background (paper)
+    outCtx.fillStyle = (getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7').trim();
+    outCtx.fillRect(0, 0, out.width, out.height);
+
+    // draw current canvas contents (backing store -> scaled to CSS)
+    outCtx.drawImage(canvas, 0, 0, out.width, out.height);
+
+    return new Promise((resolve) => out.toBlob((b) => resolve(b), 'image/png', 0.95));
+  }
+
+  // Save button handler
+  document.getElementById('saveDoodle').addEventListener('click', async () => {
+    const status = document.getElementById('saveMsg');
+    status.textContent = 'Saving…';
+
+    await ensureBucketLimit('doodles', 50 * 1024 * 1024);
+
+    const blob = await saveCanvasToBlob();
+    if (!blob) {
+      status.textContent = 'Could not create image!';
+      return;
+    }
+    const filename = `doodle-${Date.now()}.png`;
+    const { error } = await supabase.storage.from('doodles').upload(filename, blob, { upsert: false });
+
+    if (error) {
+      status.textContent = 'Error saving doodle!';
+      alert('Error saving doodle — please try again.');
+      console.error(error);
+      return;
+    }
+
+    status.textContent = randomMsg();
+    await loadDoodles();
+  });
+
+  // load doodles to grid
+  async function loadDoodles() {
+    const { data: files, error } = await supabase.storage.from('doodles').list('', {
+      limit: 100,
+      sortBy: { column: 'created_at', order: 'desc' }
     });
-
-    // random messages shown on save
-    const messages = [
-      "That one is actually pretty!",
-      "Artist appreciates this one ❤️",
-      "Ahhh… try better maybe?",
-      "World has never seen such an artist (please never draw again).",
-      "The moon criticises this doodle.",
-      "This doodle has strong 'why though?' energy.",
-      "Beautiful. No one will understand it, ever.",
-      "This belongs in a museum. A very small one.",
-      "Even Yellow criticizes this one.",
-    ];
-    function randomMsg(){ return messages[Math.floor(Math.random()*messages.length)]; }
-
-    // enforce 50MB bucket limit client-side: fetch list, calculate sizes, delete oldest until under 50MB
-    async function ensureBucketLimit(bucket='doodles', limitBytes=50*1024*1024){
-      const { data:list } = await supabase.storage.from(bucket).list('', { limit:1000, sortBy:{ column:'created_at', order:'asc' }});
-      if(!list) return;
-      // we need file sizes — Supabase list returns size in many setups; if not available server cleanup is required.
-      let total = list.reduce((s,f)=> s + (f.size||0), 0);
-      // delete oldest until under limit
-      while(total > limitBytes && list.length){
-        const oldest = list.shift();
-        if(!oldest) break;
-        await supabase.storage.from(bucket).remove([oldest.name]);
-        total -= (oldest.size||0);
-      }
+    if (error) {
+      console.error('listing error', error);
+      return;
     }
-
-    // save to Supabase
-    async function saveCanvas(){
-      // rasterize current content to blob
-      // create temporary offscreen canvas with devicePixelRatio scaling to get real resolution
-      const out = document.createElement('canvas');
-      out.width = canvas.clientWidth;
-      out.height = canvas.clientHeight;
-      const outCtx = out.getContext('2d');
-
-      // draw white paper background then current pixels
-      outCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--paper') || '#fffdf7';
-      outCtx.fillRect(0,0,out.width,out.height);
-      // draw existing canvas content
-      outCtx.drawImage(canvas, 0, 0, out.width, out.height);
-
-      return new Promise((res)=>{
-        out.toBlob(blob => res(blob), 'image/png', 0.95);
-      });
-    }
-
-    document.getElementById('saveDoodle').addEventListener('click', async () => {
-      document.getElementById('saveMsg').textContent = 'Saving…';
-      // ensure bucket limit (remove oldest until under limit)
-      await ensureBucketLimit('doodles', 50*1024*1024);
-
-      const blob = await saveCanvas();
-      const filename = `doodle-${Date.now()}.png`;
-      const { error } = await supabase.storage.from('doodles').upload(filename, blob, { upsert:false });
-
-      if(error){
-        document.getElementById('saveMsg').textContent = 'Error saving doodle!';
-        alert('Error saving doodle — please try again.');
-        console.error(error);
-        return;
-      }
-
-      // show random message
-      const msg = randomMsg();
-      document.getElementById('saveMsg').textContent = msg;
-
-      // refresh doodle grid
-      await loadDoodles();
+    const grid = document.getElementById('doodleGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    (files || []).forEach((f) => {
+      const url = `https://rgxtvwnfqglsxnmvkkus.supabase.co/storage/v1/object/public/doodles/${encodeURIComponent(f.name)}`;
+      const w = document.createElement('div');
+      w.className = 'doodle-sticker';
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.alt = 'visitor doodle';
+      w.appendChild(img);
+      grid.appendChild(w);
     });
+  }
 
-    // show doodles (post-it / grid)
-    async function loadDoodles(){
-      // list public files
-      const { data:files, error } = await supabase.storage.from('doodles').list('', { limit:100, sortBy:{ column:'created_at', order:'desc' }});
-      if(error){
-        console.error('listing error', error);
-        return;
-      }
-      const grid = document.getElementById('doodleGrid');
-      grid.innerHTML = '';
-      (files||[]).forEach(f => {
-        const url = `https://rgxtvwnfqglsxnmvkkus.supabase.co/storage/v1/object/public/doodles/${encodeURIComponent(f.name)}`;
-        const w = document.createElement('div');
-        w.className = 'doodle-sticker';
-        const img = document.createElement('img');
-        img.src = url;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.alt = 'visitor doodle';
-        w.appendChild(img);
-        grid.appendChild(w);
-      });
-    }
-
-    // initial load
-    loadDoodles();
-  </script>
-</body>
-</html>
+  // initial load
+  loadDoodles();
+</script>
