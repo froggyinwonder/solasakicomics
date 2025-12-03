@@ -250,3 +250,48 @@ header nav {
 .page * {
   max-width: 100% !important;
 }
+/* ============================================================
+   CONTACT PAGE — CENTERED LAYOUT FIX
+   ============================================================ */
+
+.contact-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.contact-wrapper {
+  width: min(600px, 90%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.contact-wrapper input,
+.contact-wrapper textarea {
+  width: 100% !important;   /* Keep mobile perfect */
+  max-width: 500px;
+}
+
+.contact-wrapper button {
+  align-self: center;
+}
+
+/* Mobile spacing */
+@media (max-width: 600px) {
+  .contact-wrapper {
+    width: 95%;
+  }
+
+  .contact-wrapper input,
+  .contact-wrapper textarea {
+    max-width: 100%;
+  }
+}
