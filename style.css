@@ -605,3 +605,93 @@ footer {
         max-width: 320px;
     }
 }
+/* ---------- Mobile layout fixes: remove huge side gutters ---------- */
+:root { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+/* make the page container actually use full width on small screens */
+.page {
+  max-width: 900px; /* keep desktop cap */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 22px;   /* default padding for desktop */
+  padding-right: 22px;
+}
+
+/* tighten padding + font scaling on small devices */
+@media (max-width: 800px) {
+  /* overall site padding */
+  .page {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* header spacing and logo size */
+  header {
+    padding: 10px 12px !important;
+  }
+  .logoarea img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .logoarea h1 {
+    font-size: 18px !important;
+    line-height: 1.05;
+  }
+  nav {
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  /* hero / sketch / comics widths should use available space */
+  .hero img,
+  .comic-rotator,
+  .sketch-wrapper,
+  .draw-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* comic of the day box centered and slightly smaller */
+  .comic-title-box {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 20px;
+  }
+
+  /* shrink big fixed elements and avoid extra left margin */
+  .sketch-wrapper, .draw-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* make the embedded instagram responsive inside the rotator */
+  .comic-rotator iframe,
+  .comic-rotator blockquote.instagram-media {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* doodle wall smaller on phones */
+  .doodle-sticker {
+    max-width: 96px;
+    width: 96px;
+    height: 96px;
+  }
+
+  /* reduce extra vertical gaps so page feels snug */
+  .page h2, .page h3 { margin-top: 10px; margin-bottom: 8px; }
+
+  /* ensure the header doesn't push content sideways */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Additional small tweak to stop accidental large left offset (rare) */
+@media (max-width: 480px) {
+  :root { --site-side-pad: 10px; }
+  .page { padding-left: var(--site-side-pad); padding-right: var(--site-side-pad); }
+}
