@@ -3,105 +3,7 @@
 <head>
   <title>Solasaki Comics</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    /* =============================
-       HERO WALLPAPER SECTION
-       ============================= */
-    .hero-wallpaper {
-      width: 100%;
-      padding: 40px 20px;
-      background-image: url("assets/uploads/wallpaper-soft.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      border-bottom: 2px dashed var(--border);
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .hero-overlay {
-      text-align: center;
-    }
-
-    .hero-doodle {
-      width: 160px;
-      max-width: 60%;
-      opacity: 0.95;
-      display: block;
-      margin: 0 auto 12px auto;
-      filter: drop-shadow(0px 3px 6px rgba(0,0,0,0.08));
-    }
-
-    .hero-text {
-      font-family: "Patrick Hand";
-      font-size: 30px;
-      background: rgba(255,255,255,0.75);
-      border: 2px dashed var(--border);
-      padding: 6px 14px;
-      border-radius: 12px;
-      display: inline-block;
-      margin: 0;
-    }
-
-    @media(max-width: 600px) {
-      .hero-doodle {
-        width: 120px;
-      }
-      .hero-text {
-        font-size: 24px;
-        padding: 6px 12px;
-      }
-      .hero-wallpaper {
-        padding: 30px 10px;
-      }
-    }
-
-    /* =============================
-       COMIC ROTATOR
-       ============================= */
-    .comic-rotator-wrapper {
-      text-align: center;
-      padding: 20px;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .comic-title-box {
-      font-family: "Patrick Hand";
-      font-size: 20px;
-      padding: 6px 14px;
-      border: 2px dashed var(--border);
-      background: #fffdf7;
-      display: inline-block;
-      border-radius: 10px;
-      margin-bottom: 14px;
-    }
-
-    .comic-rotator {
-      position: relative;
-      width: 100%;
-      min-height: 400px;
-    }
-
-    .comic-frame {
-      display: none;
-      width: 100%;
-    }
-
-    .comic-frame.active {
-      display: block;
-    }
-
-    blockquote.instagram-media {
-      margin: 0 auto !important;
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-  </style>
 </head>
-
 
 <body class="fade">
 
@@ -118,15 +20,24 @@
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
   </nav>
+
+  <!-- 🌙 DARK MODE BUTTON -->
+  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
 
-<!-- ⭐ CLEAN HERO WALLPAPER -->
-<section class="hero-banner">
-    <img src="assets/uploads/wallpaper-soft.jpg" class="hero-wallpaper">
 
-    <h2 class="hero-heading">Welcome to my sketchbook</h2>
+<!-- ⭐ HERO WALLPAPER WITH LEFT TEXT -->
+<section class="hero-wall">
+  <div class="hero-text-block">
+      <h2>Welcome to my sketchbook</h2>
+  </div>
+
+  <img src="assets/uploads/wallpaper-soft.jpg" class="hero-wallpaper" alt="Wallpaper">
 </section>
+
+
+
 
 
 <!-- ⭐ COMIC OF THE DAY -->
@@ -182,13 +93,11 @@
 </div>
 
 
+
 <footer>© 2025 Solasaki Comics</footer>
 
-
-<!-- Instagram embed script -->
 <script async src="https://www.instagram.com/embed.js"></script>
 
-<!-- Rotator logic -->
 <script>
   const frames = document.querySelectorAll(".comic-frame");
   let i = 0;
@@ -201,16 +110,12 @@
   }
 
   setInterval(rotateComic, 8000);
-</script>
-<script>
-function toggleMode() {
-  document.body.classList.toggle("night");
-  localStorage.setItem("nightMode", document.body.classList.contains("night"));
-}
 
-if (localStorage.getItem("nightMode") === "true") {
-  document.body.classList.add("night");
-}
+  /* ---- DARK MODE TOGGLE ---- */
+  function toggleMode() {
+    document.documentElement.classList.toggle("dark");
+  }
 </script>
+
 </body>
 </html>
