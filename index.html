@@ -83,6 +83,25 @@
 </section>
 
 <footer>© 2025 Solasaki Comics</footer>
+...
+<!-- Instagram embed loader -->
+<script async src="https://www.instagram.com/embed.js"></script>
 
+<!-- 🔥 Comic Rotator Script — Add here -->
+<script>
+  const frames = document.querySelectorAll(".comic-frame");
+  let i = 0;
+
+  function rotateComic() {
+    frames[i].classList.remove("active");
+    i = (i + 1) % frames.length;
+    frames[i].classList.add("active");
+  }
+
+  setInterval(rotateComic, 6000); // 6 seconds
+</script>
+
+</body>
+</html>
 </body>
 </html>
