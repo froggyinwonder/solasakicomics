@@ -1,367 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About | Solasaki Comics</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About | Solasaki Comics</title>
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    /* Small page-specific tweaks that live alongside style.css */
-    .page { max-width: 900px; margin: auto; padding: 22px; }
-    .sketch-wrapper {
-      margin-top: 22px;
-      padding: 14px;
-      border: 2px dashed var(--border);
-      background: #fffef9;
-      border-radius: 12px;
-    }
-    #drawCanvas {
-      width: 100%;
-      height: 340px;
-      display: block;
-      border-radius: 10px;
-      background: #fffdf7;
-      touch-action: none;
-    }
-    .sketch-controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .sketch-controls button {
-      padding: 10px 16px;
-      border-radius: 8px;
-      background: var(--accent);
-      color: white;
-      font-family: "Patrick Hand";
-      border: none;
-      cursor: pointer;
-      font-size: 17px;
-    }
-    .tool-secondary {
-      background: #fff;
-      color: #333;
-      border: 1px solid var(--border);
-    }
-    .doodle-wall {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 14px;
-    }
-    .doodle-sticker {
-      width: 100%;
-      max-width: 120px;
-      background: white;
-      padding: 8px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .doodle-sticker img {
-      width: 100%;
-      border-radius: 6px;
-      display:block;
-    }
-
-    /* Admin delete button style */
-    .delete-btn {
-      margin-top: 6px;
-      padding: 6px 10px;
-      font-size: 13px;
-      border: 1px dashed #c33;
-      background: #fff0f0;
-      color: #a00;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .delete-btn:hover { background: #ffd6d6; }
-
-    /* small saved message */
-    #saveMsg { font-size: 13px; color: var(--muted); margin-left: 8px; display:inline-block; vertical-align:middle; }
-
-    /* keep header toggle aligned on mobile like other pages */
-    .toggle-mode {
-      margin-left: 10px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 2px dashed var(--border);
-      background: rgba(255,255,255,0.9);
-      cursor:pointer;
-    }
-  </style>
+<link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="fade">
 
-  <header>
-    <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
-      <h1>Solasaki Comics</h1>
-    </div>
-
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a href="writeups.html">Write-ups</a>
-      <a class="active" href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-
-    <!-- Night mode toggle (keeps original behavior using documentElement.classList) -->
-    <button class="toggle-mode" onclick="toggleMode()">🌙</button>
-  </header>
-
-  <div class="page slide-up">
-    <h2>About</h2>
-
-    <p>Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.
-      I make simple comics inspired by my weird observations. You can also read my writeups if you have nothing better to do.</p>
-
-    <h3>Draw something — visitors doodle board</h3>
-
-    <div class="sketch-wrapper">
-      <canvas id="drawCanvas"></canvas>
-
-      <div class="sketch-controls">
-        <button id="pencilBtn">✏️ Pencil</button>
-        <button id="eraserBtn" class="tool-secondary">🧽 Eraser</button>
-        <button id="undoBtn" class="tool-secondary">↩️ Undo</button>
-        <button id="clearBtn" class="tool-secondary">🧹 Clear</button>
-        <button id="saveBtn">Save Doodle</button>
-        <span id="saveMsg"></span>
-      </div>
-    </div>
-
-    <h3 style="margin-top:28px">Visitors’ doodles</h3>
-    <div id="doodleGrid" class="doodle-wall" aria-live="polite"></div>
-
+<!-- ⭐ SAME HEADER AS INDEX (mobile fixed) -->
+<header>
+  <div class="logoarea">
+    <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
+    <h1>Solasaki Comics</h1>
   </div>
 
-  <footer>
-    <p>© 2025 Solasaki Comics</p>
-  </footer>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a href="writeups.html">Write-ups</a>
+    <a class="active" href="#">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
 
-  <!-- Instagram or other scripts if needed (kept out to avoid duplication) -->
+  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
+</header>
 
-  <!-- -------------------
-       SCRIPT: Canvas + Supabase + Admin Delete
-       ------------------- -->
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabase = createClient(
-      "https://rgxtvwnfqglsxnmvkkus.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJneHR2d25mcWdsc3hubXZra3VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjEwNzksImV4cCI6MjA4MDMzNzA3OX0.twtdhIMF4xnaBQsird8CyEb3g3Kh8bI5REChohdyGwo"
-    );
 
-    // Admin flag (reads localStorage)
-    const isAdmin = localStorage.getItem("admin") === "yes";
+<!-- ⭐ PAGE CONTENT -->
+<div class="page slide-up">
+  <h2>About</h2>
 
-    /* Canvas Setup */
-    const canvas = document.getElementById("drawCanvas");
-    const ctx = canvas.getContext("2d");
+  <p>Hello! Welcome to the yellow world. I'm Surbhi — creator of Solasaki Comics.
+     I make simple comics inspired by my weird observations. You can also read my writeups if you have nothing better to do.</p>
 
-    function resizeCanvas(){
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      redraw();
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+  <h3>Draw something for the artist or for yourself!!</h3>
 
-    let drawing = false;
-    let erasing = false;
-    let strokes = [];
-    let currentStroke = [];
 
-    function pos(e){
-      const r = canvas.getBoundingClientRect();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-      const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-      return {x,y};
-    }
+  <!-- ⭐ SKETCH AREA -->
+  <div class="sketch-wrapper">
+    <canvas id="drawCanvas"></canvas>
 
-    function start(e){
-      drawing = true;
+    <div class="sketch-controls">
+      <button id="pencilBtn">✏️ Pencil</button>
+      <button id="eraserBtn" class="tool-secondary">🧽 Eraser</button>
+      <button id="undoBtn" class="tool-secondary">↩️ Undo</button>
+      <button id="clearBtn" class="tool-secondary">🧹 Clear</button>
+      <button id="saveBtn">Save Doodle</button>
+
+      <span id="saveMsg" style="font-size:14px;color:var(--muted);"></span>
+    </div>
+  </div>
+
+
+  <!-- ⭐ DOODLES -->
+  <h3 style="margin-top:28px">Visitors’ doodles</h3>
+
+  <div id="doodleGrid" class="doodle-wall"></div>
+
+</div>
+
+
+
+<footer>
+  <p>© 2025 Solasaki Comics</p>
+</footer>
+
+
+
+<!-- ⭐ SCRIPT: Supabase + Drawing + Auto Delete -->
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+/* ------------------------------
+   SUPABASE SETUP
+------------------------------- */
+const supabase = createClient(
+  "https://rgxtvwnfqglsxnmvkkus.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJneHR2d25mcWdsc3hubXZra3VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjEwNzksImV4cCI6MjA4MDMzNzA3OX0.twtdhIMF4xnaBQsird8CyEb3g3Kh8bI5REChohdyGwo"
+);
+
+
+
+/* ------------------------------
+   CANVAS ENGINE THAT NEVER BREAKS
+------------------------------- */
+
+const canvas = document.getElementById("drawCanvas");
+const ctx = canvas.getContext("2d");
+
+
+function fixCanvas() {
+  const ratio = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  canvas.width = w * ratio;
+  canvas.height = h * ratio;
+
+  ctx.scale(ratio, ratio);
+  ctx.lineCap = "round";
+
+  redraw();
+}
+
+fixCanvas();
+window.addEventListener("resize", fixCanvas);
+
+
+let drawing = false;
+let erasing = false;
+let strokes = [];
+let currentStroke = [];
+
+
+/* --- Get pointer position --- */
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+}
+
+
+/* --- Start drawing --- */
+function start(e) {
+  e.preventDefault();
+  drawing = true;
+  currentStroke = [];
+
+  const p = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+
+  currentStroke.push({ ...p, erasing });
+}
+
+
+/* --- Move / draw --- */
+function move(e) {
+  if (!drawing) return;
+  e.preventDefault();
+
+  const p = getPos(e);
+
+  ctx.lineWidth = erasing ? 18 : 3;
+  ctx.strokeStyle = erasing ? "#fffdf7" : "#000";
+
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+
+  currentStroke.push({ ...p, erasing });
+}
+
+
+/* --- Stop drawing --- */
+function stop() {
+  drawing = false;
+  if (currentStroke.length > 0) strokes.push(currentStroke);
+}
+
+
+/* --- Attach pointer events --- */
+canvas.addEventListener("pointerdown", start);
+canvas.addEventListener("pointermove", move);
+window.addEventListener("pointerup", stop);
+
+
+
+/* ------------------------------
+   REDRAW ALL STROKES
+------------------------------- */
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let s of strokes) {
+    for (let i = 1; i < s.length; i++) {
+      const a = s[i - 1];
+      const b = s[i];
+
+      ctx.lineWidth = a.erasing ? 18 : 3;
+      ctx.strokeStyle = a.erasing ? "#fffdf7" : "#000";
+
       ctx.beginPath();
-      const {x,y} = pos(e);
-      ctx.moveTo(x,y);
-      currentStroke = [{x,y,erasing}];
-    }
-
-    function move(e){
-      if(!drawing) return;
-      const {x,y} = pos(e);
-      ctx.lineWidth = erasing ? 18 : 3;
-      ctx.strokeStyle = erasing ? "#fdf9f3" : "#000";
-      ctx.lineTo(x,y);
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
       ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x,y);
-      currentStroke.push({x,y,erasing});
     }
+  }
+}
 
-    function stop(){
-      drawing = false;
-      if(currentStroke.length) strokes.push(currentStroke);
+
+
+/* ------------------------------
+   BUTTONS
+------------------------------- */
+pencilBtn.onclick = () => (erasing = false);
+eraserBtn.onclick = () => (erasing = true);
+
+undoBtn.onclick = () => {
+  strokes.pop();
+  redraw();
+};
+
+clearBtn.onclick = () => {
+  strokes = [];
+  redraw();
+};
+
+
+
+/* ------------------------------
+   FUNNY SAVE MESSAGES
+------------------------------- */
+const msgs = [
+  "That one is actually pretty!",
+  "Artist appreciates this one ❤️",
+  "Ahhh… try better maybe?",
+  "World has never seen such an artist (please never draw again).",
+  "The moon criticises this doodle.",
+  "This doodle has strong 'why though?' energy.",
+  "Beautiful. No one will understand it, ever.",
+  "This belongs in a museum. A very small one.",
+  "Even Yellow criticizes this one."
+];
+const randomMsg = () => msgs[Math.floor(Math.random() * msgs.length)];
+
+
+
+/* ------------------------------
+   AUTO-DELETE IF > 50MB
+------------------------------- */
+async function enforceLimit() {
+  const { data } = await supabase.storage.from("doodles").list("", {
+    limit: 2000,
+    sortBy: { column: "created_at", order: "asc" },
+  });
+  if (!data) return;
+
+  let total = data.reduce((s, f) => s + (f.size || 0), 0);
+  const LIMIT = 50 * 1024 * 1024;
+
+  while (total > LIMIT && data.length) {
+    const oldest = data.shift();
+    await supabase.storage.from("doodles").remove([oldest.name]);
+    total -= oldest.size || 0;
+  }
+}
+
+
+
+/* ------------------------------
+   SAVE DOODLE
+------------------------------- */
+saveBtn.onclick = async () => {
+  saveMsg.textContent = "Saving…";
+
+  await enforceLimit();
+
+  canvas.toBlob(async (blob) => {
+    const name = `doodle-${Date.now()}.png`;
+    const { error } = await supabase.storage.from("doodles").upload(name, blob);
+
+    if (error) {
+      saveMsg.textContent = "Failed to save!";
+    } else {
+      saveMsg.textContent = randomMsg();
+      loadDoodles();
     }
+  });
+};
 
-    // Mouse
-    canvas.addEventListener("mousedown", start);
-    canvas.addEventListener("mousemove", move);
-    canvas.addEventListener("mouseup", stop);
-    canvas.addEventListener("mouseleave", stop);
-    // Touch
-    canvas.addEventListener("touchstart", start, {passive:false});
-    canvas.addEventListener("touchmove", move, {passive:false});
-    canvas.addEventListener("touchend", stop);
 
-    document.getElementById("pencilBtn").onclick = ()=> erasing = false;
-    document.getElementById("eraserBtn").onclick = ()=> erasing = true;
 
-    document.getElementById("undoBtn").onclick = ()=>{
-      strokes.pop();
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      redraw();
-    };
+/* ------------------------------
+   LOAD DOODLES GRID
+------------------------------- */
+async function loadDoodles() {
+  const { data } = await supabase.storage.from("doodles").list("", {
+    limit: 200,
+    sortBy: { column: "created_at", order: "desc" },
+  });
 
-    document.getElementById("clearBtn").onclick = ()=>{
-      strokes = [];
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    };
+  const grid = document.getElementById("doodleGrid");
+  grid.innerHTML = "";
 
-    function redraw(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      for(let s of strokes){
-        ctx.beginPath();
-        for(let i=0;i<s.length;i++){
-          ctx.lineWidth = s[i].erasing ? 18 : 3;
-          ctx.strokeStyle = s[i].erasing ? "#fdf9f3" : "#000";
-          if(i===0) ctx.moveTo(s[i].x,s[i].y);
-          else ctx.lineTo(s[i].x,s[i].y);
-          ctx.stroke();
-        }
-      }
-    }
+  (data || []).forEach((f) => {
+    const url =
+      `https://rgxtvwnfqglsxnmvkkus.supabase.co/storage/v1/object/public/doodles/${f.name}`;
 
-    const messages = [
-      "That one is actually pretty!",
-      "Artist appreciates this one ❤️",
-      "Ahhh… try better maybe?",
-      "World has never seen such an artist (please never draw again).",
-      "The moon criticises this one.",
-      "This doodle has strong 'why though?' energy.",
-      "Beautiful. No one will understand it, ever.",
-      "This belongs in a museum. A very small one.",
-      "Even Yellow criticizes this one."
-    ];
-    function randomMsg(){ return messages[Math.floor(Math.random()*messages.length)]; }
+    const wrap = document.createElement("div");
+    wrap.className = "doodle-sticker";
 
-    /* Bucket auto-delete oldest when > 50MB */
-    async function enforceLimit(){
-      const { data } = await supabase.storage.from("doodles").list("", {
-        limit: 2000,
-        sortBy: { column: "created_at", order: "asc" }
-      });
-      if(!data) return;
+    const img = document.createElement("img");
+    img.src = url;
 
-      let total = data.reduce((x,f)=> x + (f.size||0), 0);
-      const LIMIT = 50 * 1024 * 1024;
-      while(total > LIMIT && data.length){
-        const oldest = data.shift();
-        await supabase.storage.from("doodles").remove([oldest.name]);
-        total -= oldest.size || 0;
-      }
-    }
+    wrap.appendChild(img);
+    grid.appendChild(wrap);
+  });
+}
 
-    /* Save doodle */
-    document.getElementById("saveBtn").onclick = async ()=>{
-      document.getElementById("saveMsg").textContent = "Saving…";
-      await enforceLimit();
+loadDoodles();
+</script>
 
-      canvas.toBlob(async (blob)=>{
-        const name = `doodle-${Date.now()}.png`;
-        const { error } = await supabase.storage.from("doodles").upload(name, blob);
 
-        if(error){
-          document.getElementById("saveMsg").textContent = "Save failed!";
-          alert("Error saving doodle.");
-        } else {
-          document.getElementById("saveMsg").textContent = randomMsg();
-          loadDoodles();
-        }
-      });
-    };
 
-    /* Load doodles (admin sees delete button) */
-    async function loadDoodles(){
-      const { data } = await supabase.storage.from("doodles").list("", {
-        limit: 200,
-        sortBy: { column:"created_at", order:"desc" }
-      });
-      const grid = document.getElementById("doodleGrid");
-      grid.innerHTML = "";
+<!-- ⭐ DARK MODE -->
+<script>
+function toggleMode() {
+  document.documentElement.classList.toggle("dark");
+  localStorage.setItem("mode",
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
+}
 
-      (data || []).forEach(file => {
-        const url = `https://rgxtvwnfqglsxnmvkkus.supabase.co/storage/v1/object/public/doodles/${file.name}`;
-        const wrap = document.createElement("div");
-        wrap.className = "doodle-sticker";
+if (localStorage.getItem("mode") === "dark") {
+  document.documentElement.classList.add("dark");
+}
+</script>
 
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = "visitor doodle";
 
-        wrap.appendChild(img);
-
-        // Only admin sees delete control
-        if(isAdmin){
-          const del = document.createElement("button");
-          del.className = "delete-btn";
-          del.textContent = "❌ Delete";
-          del.onclick = () => deleteDoodle(file.name);
-          wrap.appendChild(del);
-        }
-
-        grid.appendChild(wrap);
-      });
-    }
-
-    /* Delete doodle (admin only) */
-    async function deleteDoodle(name){
-      if(!confirm("Delete this doodle forever?")) return;
-      const { error } = await supabase.storage.from("doodles").remove([name]);
-      if(error){
-        alert("Delete failed!");
-      } else {
-        loadDoodles();
-      }
-    }
-
-    // initial load
-    loadDoodles();
-
-  </script>
-
-  <!-- Dark mode toggle script: using documentElement.class (original behavior) -->
-  <script>
-    function toggleMode() {
-      document.documentElement.classList.toggle("dark");
-      localStorage.setItem("mode",
-        document.documentElement.classList.contains("dark") ? "dark" : "light"
-      );
-    }
-
-    // Apply saved mode on load
-    if (localStorage.getItem("mode") === "dark") {
-      document.documentElement.classList.add("dark");
-    }
-  </script>
 </body>
 </html>
