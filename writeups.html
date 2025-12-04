@@ -1,16 +1,16 @@
 <!doctype html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>Write-ups — Solasaki Comics</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body class="fade">
 
 <header>
   <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
+    <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
     <h1>Solasaki Comics</h1>
   </div>
 
@@ -25,65 +25,78 @@
   <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
-
 <div class="page slide-up">
-
   <h2>Write-ups</h2>
-  <p>This lazy person hasn’t posted anything yet… probably thinking about it.</p>
+  <p class="lead">This lazy person hasn’t posted anything yet... probably thinking about it.</p>
 
-  <div id="writeups-list" style="margin-top:20px;"></div>
-
+  <!-- LIST -->
+  <div id="writeups-list" class="writeups-list" aria-live="polite"></div>
 </div>
-
 
 <footer>© 2025 Solasaki Comics</footer>
 
-
-<!-- Markdown + Supabase Loader -->
+<!-- scripts -->
 <script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  "https://rgxtvwnfqglsxnmvkkus.supabase.co",
-  "public-anon-key"
-);
+  // --- UPDATE THIS with your real public anon key ---
+  const supabase = createClient(
+    "https://rgxtvwnfqglsxnmvkkus.supabase.co",
+    "public-anon-key"
+  );
 
-async function loadWriteups() {
-  const { data: files } = await supabase.storage
-    .from("writeups")
-    .list("", { limit: 200 });
+  async function loadWriteups() {
+    const listEl = document.getElementById("writeups-list");
+    listEl.innerHTML = '<p class="small-muted">Loading…</p>';
 
-  const list = document.getElementById("writeups-list");
-  list.innerHTML = "";
+    try {
+      const { data: files, error } = await supabase.storage
+        .from("writeups")
+        .list("", {limit: 200, offset: 0});
 
-  (files || []).forEach(file => {
-    if (!file.name.endsWith(".md")) return;
+      if (error) {
+        console.error("Supabase list error:", error);
+        listEl.innerHTML = `<p class="small-muted">Could not load write-ups.</p>`;
+        return;
+      }
 
-    const title = file.name.replace(".md", "");
+      if (!files || files.length === 0) {
+        listEl.innerHTML = `<p class="small-muted">No write-ups found.</p>`;
+        return;
+      }
 
-    const btn = document.createElement("a");
-    btn.href = `read.html?file=${encodeURIComponent(file.name)}`;
-    btn.className = "writeup-item";
-    btn.textContent = title;
+      // Build list
+      listEl.innerHTML = "";
+      files.sort((a,b) => (a.name > b.name ? 1 : -1));
+      files.forEach(file => {
+        if (!file.name.endsWith(".md")) return;
 
-    list.appendChild(btn);
-  });
-}
+        const name = file.name.replace(".md", "");
+        const a = document.createElement("a");
+        a.className = "writeup-item";
+        a.href = `read.html?file=${encodeURIComponent(file.name)}`;
+        a.textContent = name;
+        listEl.appendChild(a);
+      });
 
-loadWriteups();
+    } catch (e) {
+      console.error(e);
+      listEl.innerHTML = `<p class="small-muted">Error loading.</p>`;
+    }
+  }
+
+  loadWriteups();
 </script>
 
 <script>
-function toggleMode() {
-  document.documentElement.classList.toggle("dark");
-  localStorage.setItem("mode",
-      document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
-}
-if (localStorage.getItem("mode") === "dark") {
-  document.documentElement.classList.add("dark");
-}
+  function toggleMode(){
+    document.documentElement.classList.toggle("dark");
+    localStorage.setItem("mode",
+      document.documentElement.classList.contains("dark") ? "dark":"light");
+  }
+  if (localStorage.getItem("mode")==="dark"){
+    document.documentElement.classList.add("dark");
+  }
 </script>
 
 </body>
