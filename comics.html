@@ -30,12 +30,12 @@
 <!-- PAGE BODY -->
 <div class="page slide-up">
 
-  
   <h2 class="comics-page-title">Comics</h2>
 
-<div class="random-btn-wrapper">
-  <button class="random-btn">Random Comic</button>
-</div>
+  <div class="random-btn-wrapper">
+    <button class="random-btn">Random Comic</button>
+  </div>
+
   <!-- Clean container so Elfsight loads correctly -->
   <div id="comics-feed" style="margin-top:20px;">
 
@@ -49,18 +49,87 @@
 <!-- FOOTER -->
 <footer>© 2025 Solasaki Comics</footer>
 
+<!-- NEW SCRIPT: robust random-scrolling + dark mode loader -->
 <script>
-/* Random comic scroll */
-function scrollToRandom() {
-  const tryScroll = () => {
-    const posts = document.querySelectorAll(".eapps-instagram-feed-posts-item");
-    if (posts.length === 0) return setTimeout(tryScroll, 300);
+/* Robust Random comic scroll for Elfsight feed
+   - waits for .eapps-instagram-feed-posts-item elements to appear
+   - supports immediate, MutationObserver, and timed polling fallbacks
+*/
+(function () {
+  function findPosts() {
+    return document.querySelectorAll(".eapps-instagram-feed-posts-item");
+  }
+
+  function scrollToPostIndex(index) {
+    const posts = findPosts();
+    if (!posts || posts.length === 0) return false;
+    const i = Math.max(0, Math.min(index, posts.length - 1));
+    posts[i].scrollIntoView({ behavior: "smooth", block: "center" });
+    return true;
+  }
+
+  function tryScrollRandomOnce() {
+    const posts = findPosts();
+    if (!posts || posts.length === 0) return false;
     const random = Math.floor(Math.random() * posts.length);
     posts[random].scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-  tryScroll();
-}
+    return true;
+  }
+
+  function scrollToRandom() {
+    // Try immediate
+    if (tryScrollRandomOnce()) return;
+
+    // If not found yet, use MutationObserver to wait for new posts to be added
+    const feedRoot = document.getElementById('comics-feed') || document.body;
+    let timedOut = false;
+
+    // Fallback timeout (stop trying after X ms)
+    const MAX_WAIT = 7000;
+    const fallbackTimer = setTimeout(() => { timedOut = true; observer.disconnect(); }, MAX_WAIT);
+
+    const observer = new MutationObserver((mutations, obs) => {
+      if (timedOut) { obs.disconnect(); return; }
+      if (tryScrollRandomOnce()) {
+        clearTimeout(fallbackTimer);
+        obs.disconnect();
+      }
+    });
+
+    observer.observe(feedRoot, { childList: true, subtree: true });
+
+    // Extra fallback: try polling a few times (in case mutations don't fire as expected)
+    let pollCount = 0;
+    const pollMax = 14;
+    const pollInterval = 300;
+    const pollId = setInterval(() => {
+      pollCount++;
+      if (tryScrollRandomOnce() || pollCount >= pollMax || timedOut) {
+        clearInterval(pollId);
+        clearTimeout(fallbackTimer);
+        observer.disconnect();
+      }
+    }, pollInterval);
+  }
+
+  // Attach to button
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.querySelector('.random-btn');
+    if (btn) {
+      btn.addEventListener('click', scrollToRandom, { passive: true });
+    }
+
+    // Optional: keyboard support (press "r" to jump to a random comic)
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'r' || e.key === 'R') scrollToRandom();
+    });
+  });
+
+  // expose for debugging if needed
+  window._solasaki_scrollToRandom = scrollToRandom;
+})();
 </script>
+
 <script>
 function toggleMode() {
   document.documentElement.classList.toggle("dark");
