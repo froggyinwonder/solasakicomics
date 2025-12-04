@@ -10,30 +10,28 @@
 
 <header>
   <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
-      <h1>Solasaki Comics</h1>
+    <img src="assets/uploads/IMG_0079.jpeg">
+    <h1>Solasaki Comics</h1>
   </div>
 
   <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a class="active" href="writeups.html">Write-ups</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a class="active" href="writeups.html">Write-ups</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
   </nav>
 
   <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
 
-<!-- PAGE BODY -->
 <div class="page slide-up">
 
-  <h2 class="write-title">Write-ups</h2>
-
+  <h2>Write-ups</h2>
   <p>This lazy person hasn’t posted anything yet… probably thinking about it.</p>
 
-  <div id="writeup-list" style="margin-top: 20px;"></div>
+  <div id="writeups-list" style="margin-top:20px;"></div>
 
 </div>
 
@@ -41,7 +39,41 @@
 <footer>© 2025 Solasaki Comics</footer>
 
 
-<!-- DARK MODE -->
+<!-- Markdown + Supabase Loader -->
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
+const supabase = createClient(
+  "https://rgxtvwnfqglsxnmvkkus.supabase.co",
+  "public-anon-key"
+);
+
+async function loadWriteups() {
+  const { data: files } = await supabase.storage
+    .from("writeups")
+    .list("", { limit: 200 });
+
+  const list = document.getElementById("writeups-list");
+  list.innerHTML = "";
+
+  (files || []).forEach(file => {
+    if (!file.name.endsWith(".md")) return;
+
+    const title = file.name.replace(".md", "");
+
+    const btn = document.createElement("a");
+    btn.href = `read.html?file=${encodeURIComponent(file.name)}`;
+    btn.className = "writeup-item";
+    btn.textContent = title;
+
+    list.appendChild(btn);
+  });
+}
+
+loadWriteups();
+</script>
+
 <script>
 function toggleMode() {
   document.documentElement.classList.toggle("dark");
@@ -53,39 +85,6 @@ if (localStorage.getItem("mode") === "dark") {
   document.documentElement.classList.add("dark");
 }
 </script>
-
-<!-- LOAD WRITE-UP LIST -->
-<script>
-const posts = [
-  { file: "wait", title: "Wait" }
-];
-
-// render list
-const list = document.getElementById("writeup-list");
-list.innerHTML = posts.map(p => `
-  <div class="writeup-card">
-      <a href="read.html?post=${p.file}" class="writeup-link">${p.title}</a>
-  </div>
-`).join("");
-</script>
-
-<style>
-.writeup-card {
-  margin: 10px 0;
-  padding: 12px;
-  border: 2px dashed var(--border);
-  border-radius: 10px;
-  background: #fff;
-  width: fit-content;
-}
-
-.writeup-link {
-  font-family: "Patrick Hand";
-  font-size: 20px;
-  color: black;
-  text-decoration: none;
-}
-</style>
 
 </body>
 </html>
