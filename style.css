@@ -486,3 +486,50 @@ header {
 .delete-btn:hover {
     background: #ffd6d6;
 }
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 2px dashed var(--border);
+    gap: 10px;
+}
+
+.logoarea {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logoarea img {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+}
+
+nav {
+    display: flex;
+    gap: 18px;
+    flex-wrap: nowrap;
+}
+
+nav a {
+    font-weight: bold;
+}
+
+.toggle-mode {
+    margin-left: 6px;
+   @media (max-width: 600px) {
+  header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+  }
+
+  nav {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+  }
+}
+}
