@@ -591,3 +591,61 @@ nav a {
         height: 60px;
     }
 }
+/* ======== UNIFIED HEADER & MOBILE LAYOUT FIX ======== */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 2px dashed var(--border);
+  gap: 10px;
+}
+
+.logoarea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoarea img {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+}
+
+nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: nowrap;
+}
+
+nav a {
+  font-weight: bold;
+}
+
+.toggle-mode {
+  margin-left: 6px;
+}
+
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+  }
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+  }
+  .toggle-mode {
+    margin-top: 6px;
+  }
+  .logoarea img {
+    width: 60px;
+    height: 60px;
+  }
+}
