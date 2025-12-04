@@ -705,3 +705,22 @@ nav a {
   color:inherit;
 }
 .lead { max-width:900px; margin: 8px auto 0; }
+/* Centers page content */
+.page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Write-up buttons */
+.write-item {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 16px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    font-family: "Patrick Hand";
+    font-size: 18px;
+    text-decoration: none;
+    color: var(--text);
+}
