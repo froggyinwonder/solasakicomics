@@ -2,48 +2,46 @@
 <html>
 <head>
   <title>Solasaki Comics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="fade">
 
+<!-- ⭐ SAME HEADER AS ABOUT + COMICS -->
 <header>
   <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
-      <h1>Solasaki Comics</h1>
+    <img src="assets/uploads/IMG_0079.jpeg">
+    <h1>Solasaki Comics</h1>
   </div>
 
   <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a href="writeups.html">Write-ups</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <a class="active" href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a href="writeups.html">Write-ups</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
   </nav>
 
   <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
 
-
-<!-- ⭐ WRAP PAGE CONTENT (THE FIX) ⭐ -->
+<!-- ⭐ PAGE WRAPPER (this was missing!) -->
 <div class="page">
 
 
-
-<!-- ⭐ HERO WALLPAPER WITH LEFT TEXT -->
+<!-- ⭐ HERO WALLPAPER LEFT TEXT -->
 <section class="hero-wall">
   <div class="hero-text-block">
       <h2>Welcome to my sketchbook</h2>
   </div>
 
-  <img src="assets/uploads/wallpaper-soft.jpg" class="hero-wallpaper" alt="Wallpaper">
+  <img src="assets/uploads/wallpaper-soft.jpg" class="hero-wallpaper">
 </section>
 
 
-
-
-<!-- ⭐ COMIC OF THE DAY -->
+<!-- ⭐ COMIC ROTATOR -->
 <div class="comic-rotator-wrapper">
 
   <div class="comic-title-box">Comic/Art of the Day</div>
@@ -95,10 +93,7 @@
   </div>
 </div>
 
-
-
-</div> <!-- ⭐ END .page ⭐ -->
-
+</div> <!-- END PAGE WRAPPER -->
 
 
 <footer>© 2025 Solasaki Comics</footer>
@@ -118,9 +113,15 @@
 
   setInterval(rotateComic, 8000);
 
-  /* ---- DARK MODE TOGGLE ---- */
   function toggleMode() {
     document.documentElement.classList.toggle("dark");
+    localStorage.setItem("mode",
+      document.documentElement.classList.contains("dark") ? "dark" : "light"
+    );
+  }
+
+  if (localStorage.getItem("mode") === "dark") {
+     document.documentElement.classList.add("dark");
   }
 </script>
 
