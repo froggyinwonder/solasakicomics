@@ -1,88 +1,75 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
   <title>Read — Solasaki Comics</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="fade">
 
 <header>
   <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
-    <h1>Solasaki Comics</h1>
+      <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
+      <h1>Solasaki Comics</h1>
   </div>
 
   <nav>
-    <a href="index.html">Home</a>
-    <a href="comics.html">Comics</a>
-    <a href="writeups.html">Write-ups</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
+      <a href="index.html">Home</a>
+      <a href="comics.html">Comics</a>
+      <a class="active" href="writeups.html">Write-ups</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
   </nav>
 
   <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
-<div class="page slide-up">
-  <a class="back-btn" href="writeups.html">← Back to Write-ups</a>
+<div class="page">
 
-  <h2 id="writeup-title"></h2>
-  <article id="writeup-content" class="writeup-content"></article>
-</div>
+<a class="back-btn" href="writeups.html">← Back to Write-ups</a>
+
+<div id="content"></div>
+
+</div> <!-- end .page -->
 
 <footer>© 2025 Solasaki Comics</footer>
 
-<script type="module">
-  import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-  const supabase = createClient(
-    "https://rgxtvwnfqglsxnmvkkus.supabase.co",
-    "public-anon-key" // replace with your real anon key
-  );
-
+<script>
+async function load() {
   const params = new URLSearchParams(location.search);
   const file = params.get("file");
-  document.getElementById("writeup-title").textContent = file ? file.replace(".md","") : "";
 
-  async function load() {
-    const contentEl = document.getElementById("writeup-content");
-    if (!file) {
-      contentEl.innerHTML = "<p>Missing file parameter.</p>";
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.storage.from("writeups").download(file);
-      if (error) {
-        console.error("download error", error);
-        contentEl.innerHTML = `<p>Could not load write-up.</p>`;
-        return;
-      }
-
-      const text = await data.text();
-      contentEl.innerHTML = marked.parse(text || "");
-    } catch (e) {
-      console.error(e);
-      contentEl.innerHTML = `<p>Unexpected error.</p>`;
-    }
+  if (!file) {
+    document.getElementById("content").textContent = "File not found.";
+    return;
   }
 
-  load();
+  try {
+    const resp = await fetch("/writeups/" + file);
+    const txt = await resp.text();
+    document.getElementById("content").innerHTML =
+      marked.parse(txt);
+  } catch (err) {
+    document.getElementById("content").textContent = "Error loading write-up.";
+  }
+}
+load();
+
+/* Dark mode */
+function toggleMode() {
+  document.documentElement.classList.toggle("dark");
+  localStorage.setItem("mode",
+      document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
+}
+if (localStorage.getItem("mode") === "dark") {
+  document.documentElement.classList.add("dark");
+}
 </script>
 
-<script>
-  function toggleMode(){
-    document.documentElement.classList.toggle("dark");
-    localStorage.setItem("mode",
-      document.documentElement.classList.contains("dark") ? "dark":"light");
-  }
-  if (localStorage.getItem("mode")==="dark"){
-    document.documentElement.classList.add("dark");
-  }
-</script>
+<!-- markdown parser -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 </body>
 </html>
