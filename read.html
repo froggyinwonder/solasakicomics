@@ -1,83 +1,33 @@
-<!doctype html>
-<html>
-<head>
-  <title>Read — Solasaki Comics</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    .post-container {
-      max-width: 750px;
-      margin: auto;
-      padding: 20px;
-    }
-    .post-container h1 {
-      font-family: "Patrick Hand";
-      font-size: 32px;
-    }
-    .post-meta {
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-
-<body class="fade">
-
-<header>
-  <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
-    <h1>Solasaki Comics</h1>
-  </div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="writeups.html">Write-ups</a>
-  </nav>
-</header>
-
-<div class="post-container slide-up">
-  <h1 id="postTitle"></h1>
-  <div id="postMeta" class="post-meta"></div>
-  <div id="postContent"></div>
+<div class="page slide-up">
+  <div id="postContainer"></div>
 </div>
 
-<footer>© 2025 Solasaki Comics</footer>
-
 <script>
-// Get file name from URL
-const params = new URLSearchParams(location.search);
-const file = params.get("file");
+async function loadPost() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-async function load() {
-  if (!file) return;
+  const res = await fetch("/writeups.json");
+  const posts = await res.json();
 
-  const raw = await fetch("/writeups/" + file).then(r => r.text());
+  const post = posts.find(p => p.id === id);
 
-  const meta = raw.match(/---([\s\S]*?)---/);
-  let title = file.replace(".md","");
-  let date = "";
-  
-  let body = raw.replace(/---[\s\S]*?---/, "");
+  const container = document.getElementById("postContainer");
 
-  if (meta) {
-    const block = meta[1];
-    title = (block.match(/title:\s*(.+)/)||[])[1] || title;
-    date = (block.match(/date:\s*(.+)/)||[])[1] || "";
+  if (!post) {
+    container.innerHTML = "<p>Post not found.</p>";
+    return;
   }
 
-  // Reading time
-  const readingTime = Math.ceil(body.split(/\s+/).length / 150);
+  const words = post.content.split(/\s+/).length;
+  const time = Math.ceil(words / 150) + " min read";
 
-  document.getElementById("postTitle").textContent = title;
-  document.getElementById("postMeta").textContent = `${date} · ${readingTime} min read`;
-
-  // Convert Markdown → HTML (simple)
-  document.getElementById("postContent").innerHTML =
-      body.replace(/\n\n/g,"<br><br>");
-
+  container.innerHTML = `
+    <a href="writeups.html" class="back-btn">← Back</a>
+    <h2>${post.title}</h2>
+    <small>${new Date(post.date).toDateString()} • ${time}</small>
+    <p style="margin-top:20px;white-space:pre-line;">${post.content}</p>
+  `;
 }
-load();
+loadPost();
 </script>
-
-</body>
-</html>
