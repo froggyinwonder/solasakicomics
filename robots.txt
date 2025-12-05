@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://solasakicomics.vercel.app/sitemap.xml
