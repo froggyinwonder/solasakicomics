@@ -1,72 +1,118 @@
 <div class="page slide-up">
-  <h2 class="page-title">Write-ups</h2>
+  <h2 class="writeups-title">Write-ups</h2>
 
-  <input id="searchBox" type="text" placeholder="Search write-ups…" />
+  <!-- Search Bar -->
+  <input id="searchBar" type="text" placeholder="Search write-ups…" class="search-input"/>
 
-  <div id="writeupsContainer" class="writeups-list"></div>
+  <div id="writeupsList" class="writeups-container"></div>
+
+  <p id="emptyMessage" class="empty-message" style="display:none;">No write-ups found.</p>
 </div>
 
 <script>
 async function loadWriteups() {
-  const container = document.getElementById("writeupsContainer");
+  const listEl = document.getElementById("writeupsList");
+  const searchEl = document.getElementById("searchBar");
+  const emptyEl = document.getElementById("emptyMessage");
 
-  // List of files (edit names only here!)
-  const files = [
-    "weird",
-    "stay",
-    "everything"
-  ];
+  const res = await fetch("/writeups/list.json");
+  const posts = await res.json();
 
-  container.innerHTML = "";
+  function render(filter = "") {
+    listEl.innerHTML = "";
 
-  for (const name of files) {
-    const res = await fetch(`/writeups/${name}.txt`);
-    if (!res.ok) continue;
+    const filtered = posts.filter(p =>
+      p.title.toLowerCase().includes(filter.toLowerCase())
+    );
 
-    const text = await res.text();
-    const preview = text.substring(0, 150) + "...";
+    emptyEl.style.display = filtered.length ? "none" : "block";
 
-    const minutes = Math.max(1, Math.ceil(text.split(" ").length / 180));
+    filtered.forEach(p => {
+      const card = document.createElement("a");
+      card.href = `/read.html?file=${p.file}`;
+      card.className = "writeup-card";
 
-    const card = `
-      <a class="write-card" href="read.html?post=${name}">
-        <h3>${name}</h3>
-        <p>${preview}</p>
-        <small>⏱ ${minutes} min read</small>
-      </a>
-    `;
+      card.innerHTML = `
+        <h3>${p.title}</h3>
+        <p class="preview">${p.preview}</p>
+        <div class="meta">${p.date} • ${p.readTime} min read</div>
+      `;
 
-    container.insertAdjacentHTML("beforeend", card);
+      listEl.appendChild(card);
+    });
   }
+
+  searchEl.addEventListener("input", e => render(e.target.value));
+  render();
 }
 
 loadWriteups();
-
-
-// 🔍 SEARCH
-document.getElementById("searchBox").addEventListener("input", function () {
-  const q = this.value.toLowerCase();
-  document.querySelectorAll(".write-card").forEach(card => {
-    card.style.display = card.textContent.toLowerCase().includes(q)
-      ? "block"
-      : "none";
-  });
-});
 </script>
 
 <style>
-.write-card {
-  display:block;
-  padding:16px;
-  margin:12px 0;
-  border:1px solid #ddd;
-  border-radius:8px;
-  text-decoration:none;
-  color:black;
-  background:white;
+/* Title */
+.writeups-title {
+  margin-bottom: 20px;
+  font-size: 28px;
 }
-.write-card:hover {
-  background:#fafafa;
+
+/* Search bar */
+.search-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 26px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
 }
-.write-card h3 { margin:0 0 8px; }
+
+/* Medium-style container */
+.writeups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* Medium-style card */
+.writeup-card {
+  display: block;
+  padding: 22px 26px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: var(--bg2);
+  border: 1px solid #ddd;
+  transition: 0.2s;
+}
+
+.writeup-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.writeup-card h3 {
+  margin: 0;
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.writeup-card .preview {
+  margin: 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.writeup-card .meta {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #777;
+}
+
+/* Empty message */
+.empty-message {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 16px;
+  opacity: 0.7;
+}
 </style>
