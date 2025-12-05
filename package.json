@@ -5,3 +5,7 @@
     "resend": "latest"
   }
 }
+"scripts": {
+  "generate": "node scripts/generate-list.js",
+  "build": "npm run generate"
+}
