@@ -1,68 +1,82 @@
 <!doctype html>
 <html>
 <head>
-  <title>Write-up — Solasaki Comics</title>
+  <title>Read — Solasaki Comics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 
-  <!-- markdown converter -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .post-container {
+      max-width: 750px;
+      margin: auto;
+      padding: 20px;
+    }
+    .post-container h1 {
+      font-family: "Patrick Hand";
+      font-size: 32px;
+    }
+    .post-meta {
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 
 <body class="fade">
 
 <header>
   <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg">
-      <h1>Solasaki Comics</h1>
+    <img src="assets/uploads/IMG_0079.jpeg">
+    <h1>Solasaki Comics</h1>
   </div>
-
   <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a class="active" href="writeups.html">Write-ups</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="writeups.html">Write-ups</a>
   </nav>
-
-  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
-
-<div class="page slide-up">
-  <div id="content" class="entry"></div>
+<div class="post-container slide-up">
+  <h1 id="postTitle"></h1>
+  <div id="postMeta" class="post-meta"></div>
+  <div id="postContent"></div>
 </div>
 
 <footer>© 2025 Solasaki Comics</footer>
 
-
 <script>
-// Read markdown file from URL parameter
-const file = new URLSearchParams(location.search).get("id");
+// Get file name from URL
+const params = new URLSearchParams(location.search);
+const file = params.get("file");
 
-if(!file){
-  document.getElementById("content").innerHTML = "<h3>Write-up not found.</h3>";
-} else {
-  fetch("writeups/" + file)
-    .then(res => res.text())
-    .then(md => {
-      document.getElementById("content").innerHTML = marked.parse(md);
-    })
-    .catch(()=>{
-      document.getElementById("content").innerHTML = "<h3>Could not load write-up.</h3>";
-    });
-}
+async function load() {
+  if (!file) return;
 
-// DARK MODE
-function toggleMode() {
-  document.documentElement.classList.toggle("dark");
-  localStorage.setItem("mode",
-     document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
+  const raw = await fetch("/writeups/" + file).then(r => r.text());
+
+  const meta = raw.match(/---([\s\S]*?)---/);
+  let title = file.replace(".md","");
+  let date = "";
+  
+  let body = raw.replace(/---[\s\S]*?---/, "");
+
+  if (meta) {
+    const block = meta[1];
+    title = (block.match(/title:\s*(.+)/)||[])[1] || title;
+    date = (block.match(/date:\s*(.+)/)||[])[1] || "";
+  }
+
+  // Reading time
+  const readingTime = Math.ceil(body.split(/\s+/).length / 150);
+
+  document.getElementById("postTitle").textContent = title;
+  document.getElementById("postMeta").textContent = `${date} · ${readingTime} min read`;
+
+  // Convert Markdown → HTML (simple)
+  document.getElementById("postContent").innerHTML =
+      body.replace(/\n\n/g,"<br><br>");
+
 }
-if(localStorage.getItem("mode")==="dark") {
-  document.documentElement.classList.add("dark");
-}
+load();
 </script>
 
 </body>
