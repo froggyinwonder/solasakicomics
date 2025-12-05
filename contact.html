@@ -1,19 +1,24 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <title>Contact — Solasaki</title>
+  <title>Contact — Solasaki Comics</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <meta name="description" content="Solasaki Comics – comics, write-ups, doodles and fun sketches by Surbhi.">
   <meta name="keywords" content="Solasaki Comics, comics, doodles, art, writeups">
   <meta name="author" content="Surbhi">
+
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="logo.png">
 </head>
 
 <body class="fade">
 
+<!-- HEADER (same across all pages) -->
 <header>
   <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
+    <img src="assets/uploads/IMG_0079.jpeg" alt="logo">
     <h1>Solasaki Comics</h1>
   </div>
 
@@ -29,8 +34,9 @@
 </header>
 
 
-<!-- contact.html (only the form part / place inside your existing layout) -->
+<!-- CONTACT CONTENT -->
 <div class="page slide-up">
+  
   <h2 class="contact-page-title">Contact</h2>
 
   <div class="contact-page">
@@ -39,17 +45,21 @@
         <input id="name" name="name" type="text" placeholder="Your name" required>
         <input id="email" name="email" type="email" placeholder="Email address" required>
         <textarea id="message" name="message" placeholder="Your message" rows="6" required></textarea>
+
         <button id="sendBtn" type="submit">Send</button>
-        <div id="contactStatus" role="status" style="margin-top:10px;"></div>
+        <div id="contactStatus" style="margin-top:10px;"></div>
       </form>
     </div>
   </div>
+
 </div>
 
+
+<!-- CONTACT FORM SCRIPT -->
 <script>
 document.getElementById("contactForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-  
+
   const status = document.getElementById("contactStatus");
   status.textContent = "Sending…";
 
@@ -80,6 +90,21 @@ document.getElementById("contactForm").addEventListener("submit", async function
     console.error(err);
   }
 });
+</script>
+
+
+<!-- 🌙 DARK MODE SCRIPT (THIS IS WHAT WAS MISSING) -->
+<script>
+function toggleMode() {
+  document.documentElement.classList.toggle('dark');
+  localStorage.setItem(
+    'mode',
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  );
+}
+if (localStorage.getItem("mode") === "dark") {
+  document.documentElement.classList.add("dark");
+}
 </script>
 
 </body>
