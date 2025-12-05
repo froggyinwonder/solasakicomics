@@ -10,16 +10,16 @@
 
 <header>
   <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
-    <h1>Solasaki Comics</h1>
+      <img src="assets/uploads/IMG_0079.jpeg">
+      <h1>Solasaki Comics</h1>
   </div>
 
   <nav>
-    <a href="index.html">Home</a>
-    <a href="comics.html">Comics</a>
-    <a class="active" href="writeups.html">Write-ups</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
+      <a href="index.html">Home</a>
+      <a href="comics.html">Comics</a>
+      <a class="active" href="writeups.html">Write-ups</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
   </nav>
 
   <button class="toggle-mode" onclick="toggleMode()">🌙</button>
@@ -28,54 +28,72 @@
 
 <div class="page slide-up">
 
-  <h2 class="writeups-title">Write-ups</h2>
+  <h2>Write-ups</h2>
 
-  <div id="writeupsList" class="writeups-grid"></div>
+  <!-- Search bar -->
+  <input id="searchBox" type="text" placeholder="Search writeups..." style="
+      width:100%; padding:10px; font-size:16px; border:2px dashed var(--border);
+      border-radius:10px; margin-bottom:18px;
+  " />
+
+  <!-- Blog cards container -->
+  <div id="writeupList" style="
+      display:grid; gap:18px;
+      grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  "></div>
 
 </div>
 
-
 <footer>© 2025 Solasaki Comics</footer>
 
+
 <script>
-async function loadWriteups() {
-  const container = document.getElementById("writeupsList");
+// ⭐ Step 1 — List of markdown files (you only edit this array when adding a new file)
+const writeups = [
+  { file: "weird.md", title: "Weird" },
+  { file: "stay.md", title: "Stay" },
+  { file: "everything.md", title: "Everything" }
+];
 
-  try {
-    const res = await fetch("writeups/list.json");
-    const posts = await res.json();
+// ⭐ Step 2 — Build writeup cards
+function renderWriteups(filter = "") {
+  const list = document.getElementById("writeupList");
+  list.innerHTML = "";
 
-    container.innerHTML = "";
-
-    posts.forEach(post => {
-      const card = document.createElement("a");
-      card.href = `read.html?post=${post.file}`;
-      card.className = "writeup-card";
+  writeups
+    .filter(w => w.title.toLowerCase().includes(filter.toLowerCase()))
+    .forEach(w => {
+      const card = document.createElement("div");
+      card.className = "entry";
+      card.style.cursor = "pointer";
+      card.style.padding = "18px";
+      card.onclick = () => location.href = `read.html?id=${w.file}`;
 
       card.innerHTML = `
-        <h3>${post.title}</h3>
-        <p class="excerpt">${post.excerpt}</p>
-        <span class="read-more">Read →</span>
+        <h3>${w.title}</h3>
+        <p>Read more →</p>
       `;
-
-      container.appendChild(card);
+      list.appendChild(card);
     });
-
-  } catch (err) {
-    container.innerHTML = "<p class='error-msg'>Could not load write-ups.</p>";
-  }
 }
 
-loadWriteups();
+// search function
+document.getElementById("searchBox").oninput = (e)=>{
+  renderWriteups(e.target.value);
+};
 
+// initial load
+renderWriteups();
+
+
+// ⭐ DARK MODE
 function toggleMode() {
   document.documentElement.classList.toggle("dark");
   localStorage.setItem("mode",
-      document.documentElement.classList.contains("dark") ? "dark" : "light"
+     document.documentElement.classList.contains("dark") ? "dark" : "light"
   );
 }
-
-if (localStorage.getItem("mode") === "dark") {
+if(localStorage.getItem("mode")==="dark") {
   document.documentElement.classList.add("dark");
 }
 </script>
