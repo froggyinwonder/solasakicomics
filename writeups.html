@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Write-ups • Solasaki Comics</title>
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Write-ups • Solasakicomics</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <meta name="description" content="Read personal write-ups, stories, and thoughts from Solasakicomics.">
 
   <style>
     .writeup-container {
@@ -28,9 +32,7 @@
       background: #fffefc;
       transition: 0.2s;
     }
-    .card:hover {
-      background: #fff;
-    }
+    .card:hover { background: #fff; }
     .card-title {
       font-size: 22px;
       font-weight: bold;
@@ -38,7 +40,7 @@
     }
     .card-meta {
       font-size: 14px;
-      opacity: 0.7;
+      opacity: .7;
       margin-bottom: 10px;
     }
   </style>
@@ -46,23 +48,28 @@
 
 <body>
 
-<!-- 🔹 HEADER (same as all other pages) -->
+<!-- HEADER (SAME AS OTHER PAGES) -->
 <header>
-  <div class="header-wrapper">
-    <a href="/" class="logo-link"><img src="/logo.png" class="logo"></a>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/comics.html">Comics</a>
-      <a class="active" href="/writeups.html">Write-ups</a>
-      <a href="/about.html">About</a>
-      <a href="/contact.html">Contact</a>
-    </nav>
+  <div class="logo-row">
+    <img src="logo.png" class="logo">
+    <h1 class="brand">Solasaki Comics</h1>
   </div>
+
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a class="active" href="writeups.html">Write-ups</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <button id="themeToggle" class="theme-btn">🌙</button>
+  </nav>
+
+  <hr class="divider">
 </header>
 
 <div class="writeup-container">
   <h1>Write-ups</h1>
-  <input class="search-box" id="search" placeholder="Search write-ups…">
+  <input id="search" class="search-box" placeholder="Search write-ups…">
   <div id="list"></div>
 </div>
 
@@ -72,41 +79,20 @@
 
 <script>
 async function loadWriteups() {
-  const folder = "/writeups/";
-
-  // fetch directory files (Vercel allows static directory listing)
-  const res = await fetch(folder);
-  const html = await res.text();
-
-  let files = [...html.matchAll(/href="([^"]+\.txt)"/g)].map(m => m[1]);
+  // READ THE LIST.JSON FILE
+  const res = await fetch("/writeups/list.json");
+  const posts = await res.json();
 
   const list = document.getElementById("list");
-  if (!files.length) {
+
+  if (!posts.length) {
     list.innerHTML = "<p>No write-ups yet…</p>";
     return;
   }
 
-  let posts = [];
-
-  for (const file of files) {
-    const txt = await fetch(folder + file).then(r => r.text());
-    const lines = txt.split("\n");
-
-    const title = lines[0].trim();
-    const preview = lines.slice(1, 5).join(" ").slice(0, 180) + "...";
-    const readingTime = Math.ceil(txt.split(" ").length / 180);
-
-    posts.push({
-      file,
-      title,
-      preview,
-      readingTime,
-    });
-  }
-
   function render(items) {
     list.innerHTML = items.map(p => `
-      <a href="/read.html?post=${p.file}">
+      <a href="read.html?post=${p.file}">
         <div class="card">
           <div class="card-title">${p.title}</div>
           <div class="card-meta">${p.readingTime} min read</div>
@@ -118,10 +104,13 @@ async function loadWriteups() {
 
   render(posts);
 
-  // 🔍 search function
+  // SEARCH
   document.getElementById("search").addEventListener("input", e => {
     const q = e.target.value.toLowerCase();
-    render(posts.filter(p => p.title.toLowerCase().includes(q) || p.preview.toLowerCase().includes(q)));
+    render(posts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.preview.toLowerCase().includes(q)
+    ));
   });
 }
 
