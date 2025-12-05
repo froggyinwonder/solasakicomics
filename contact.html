@@ -26,43 +26,58 @@
 </header>
 
 
+<!-- contact.html (only the form part / place inside your existing layout) -->
 <div class="page slide-up">
+  <h2 class="contact-page-title">Contact</h2>
 
-<h2 class="contact-page-title">Contact</h2>
-
-<div class="contact-page">
-  <div class="contact-wrapper">
-      <form action="https://formsubmit.co/solasakicomics@gmail.com" method="POST">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_subject" value="New message from Solasaki Comics website!">
-    <input type="hidden" name="_template" value="box">
-    <input type="hidden" name="_next" value="https://solasakicomics-site.vercel.app/contact.html">
-
-    <input type="text" name="name" placeholder="Your name" required>
-    <input type="email" name="email" placeholder="Email address" required>
-    <textarea name="message" placeholder="Your message" rows="4" required></textarea>
-
-    <button type="submit">Send</button>
-</form>
+  <div class="contact-page">
+    <div class="contact-wrapper">
+      <form id="contactForm">
+        <input id="name" name="name" type="text" placeholder="Your name" required>
+        <input id="email" name="email" type="email" placeholder="Email address" required>
+        <textarea id="message" name="message" placeholder="Your message" rows="6" required></textarea>
+        <button id="sendBtn" type="submit">Send</button>
+        <div id="contactStatus" role="status" style="margin-top:10px;"></div>
+      </form>
+    </div>
   </div>
 </div>
 
-</div> <!-- END PAGE -->
-
-
-<footer>© 2025 Solasaki Comics</footer>
-
 <script>
-function toggleMode() {
-  document.documentElement.classList.toggle("dark");
-  localStorage.setItem("mode",
-      document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
-}
+document.getElementById("contactForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const status = document.getElementById("contactStatus");
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+  status.textContent = "Sending…";
 
-if (localStorage.getItem("mode") === "dark") {
-   document.documentElement.classList.add("dark");
-}
+  const payload = {
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    message: document.getElementById("message").value.trim()
+  };
+
+  try {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      status.textContent = "Message sent — thanks!";
+      document.getElementById("contactForm").reset();
+    } else {
+      status.textContent = data?.error || "Could not send message.";
+    }
+  } catch (err) {
+    status.textContent = "Network error. Try again later.";
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
 </script>
 
 </body>
