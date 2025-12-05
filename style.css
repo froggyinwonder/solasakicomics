@@ -882,3 +882,38 @@ body, html {
     min-width: 0 !important;
   }
 }
+/* ---------------------------------------------------
+   FIX HEADER OVERLAP ON MOBILE
+--------------------------------------------------- */
+
+header {
+  position: relative;
+  z-index: 10;
+  background: var(--paper);
+}
+
+/* Push page content down so it never hides behind header */
+body {
+  padding-top: 95px; /* desktop default */
+}
+
+/* Smaller padding for mobile so header looks correct */
+@media (max-width: 480px) {
+  body {
+    padding-top: 115px;  /* gives room for logo + nav + moon button */
+  }
+
+  header {
+    padding: 10px 12px;
+  }
+
+  .logoarea img {
+    width: 44px;
+    height: 44px;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
