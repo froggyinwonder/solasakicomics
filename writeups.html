@@ -3,99 +3,158 @@
 <head>
   <title>Write-ups — Solasaki Comics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- SEO -->
+  <meta name="description" content="Writeups by Solasaki — quirky thoughts, stories, and observations.">
+
+  <style>
+    .writeup-card {
+      border: 2px dashed var(--border);
+      padding: 18px;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      background: #fffdf7;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    .writeup-card h3 {
+      margin: 0 0 6px 0;
+      font-family: "Patrick Hand";
+      font-size: 24px;
+    }
+    .writeup-meta {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .searchbar input {
+      width: 100%;
+      max-width: 480px;
+    }
+  </style>
 </head>
 
 <body class="fade">
 
 <header>
   <div class="logoarea">
-      <img src="assets/uploads/IMG_0079.jpeg">
-      <h1>Solasaki Comics</h1>
+    <img src="assets/uploads/IMG_0079.jpeg">
+    <h1>Solasaki Comics</h1>
   </div>
-
   <nav>
-      <a href="index.html">Home</a>
-      <a href="comics.html">Comics</a>
-      <a class="active" href="writeups.html">Write-ups</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="comics.html">Comics</a>
+    <a class="active" href="writeups.html">Write-ups</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
   </nav>
-
-  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
-
 <div class="page slide-up">
-
   <h2>Write-ups</h2>
 
-  <!-- Search bar -->
-  <input id="searchBox" type="text" placeholder="Search writeups..." style="
-      width:100%; padding:10px; font-size:16px; border:2px dashed var(--border);
-      border-radius:10px; margin-bottom:18px;
-  " />
+  <div class="searchbar">
+    <input type="text" id="searchInput" placeholder="Search writeups…">
+  </div>
 
-  <!-- Blog cards container -->
-  <div id="writeupList" style="
-      display:grid; gap:18px;
-      grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-  "></div>
+  <div id="writeupsList"></div>
 
+  <div id="pagination" style="text-align:center; margin-top:20px;"></div>
 </div>
 
 <footer>© 2025 Solasaki Comics</footer>
 
-
 <script>
-// ⭐ Step 1 — List of markdown files (you only edit this array when adding a new file)
-const writeups = [
-  { file: "weird.md", title: "Weird" },
-  { file: "stay.md", title: "Stay" },
-  { file: "everything.md", title: "Everything" }
-];
+// -------- SETTINGS --------
+const ITEMS_PER_PAGE = 5;
 
-// ⭐ Step 2 — Build writeup cards
-function renderWriteups(filter = "") {
-  const list = document.getElementById("writeupList");
-  list.innerHTML = "";
+// Load all markdown files dynamically
+async function loadWriteups() {
+  const req = await fetch("/writeups/");
+  const html = await req.text();
+  const files = [...html.matchAll(/href="([^"]+\.md)"/g)].map(m => m[1]);
 
-  writeups
-    .filter(w => w.title.toLowerCase().includes(filter.toLowerCase()))
-    .forEach(w => {
-      const card = document.createElement("div");
-      card.className = "entry";
-      card.style.cursor = "pointer";
-      card.style.padding = "18px";
-      card.onclick = () => location.href = `read.html?id=${w.file}`;
+  const writeups = [];
 
-      card.innerHTML = `
-        <h3>${w.title}</h3>
-        <p>Read more →</p>
-      `;
-      list.appendChild(card);
+  for (let f of files) {
+    const raw = await fetch("/writeups/" + f).then(r => r.text());
+
+    const meta = raw.match(/---([\s\S]*?)---/);
+    let title = f.replace(".md","");
+    let desc = "";
+    let date = "Unknown";
+    
+    if (meta) {
+      const block = meta[1];
+      title = (block.match(/title:\s*(.+)/)||[])[1] || title;
+      desc = (block.match(/description:\s*(.+)/)||[])[1] || "";
+      date = (block.match(/date:\s*(.+)/)||[])[1] || "Unknown";
+    }
+
+    const content = raw.replace(/---[\s\S]*?---/, "");
+    const readingTime = Math.ceil(content.split(/\s+/).length / 150);
+
+    writeups.push({
+      file: f,
+      title,
+      desc,
+      date,
+      readingTime
     });
+  }
+
+  return writeups.reverse(); // newest first
 }
 
-// search function
-document.getElementById("searchBox").oninput = (e)=>{
-  renderWriteups(e.target.value);
-};
+// -------- RENDER LIST --------
+let allWriteups = [];
+let filtered = [];
+let page = 1;
 
-// initial load
-renderWriteups();
+function renderList() {
+  const start = (page-1)*ITEMS_PER_PAGE;
+  const shown = filtered.slice(start, start+ITEMS_PER_PAGE);
 
+  const list = document.getElementById("writeupsList");
+  list.innerHTML = shown.map(w => `
+    <div class="writeup-card">
+      <h3><a href="read.html?file=${w.file}">${w.title}</a></h3>
+      <div class="writeup-meta">${w.date} · ${w.readingTime} min read</div>
+      <p>${w.desc}</p>
+    </div>
+  `).join("");
 
-// ⭐ DARK MODE
-function toggleMode() {
-  document.documentElement.classList.toggle("dark");
-  localStorage.setItem("mode",
-     document.documentElement.classList.contains("dark") ? "dark" : "light"
+  renderPagination();
+}
+
+function renderPagination() {
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  let html = "";
+
+  for (let i=1;i<=totalPages;i++) {
+    html += `<button onclick="page=${i};renderList()" style="margin:4px">${i}</button>`;
+  }
+
+  document.getElementById("pagination").innerHTML = html;
+}
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  filtered = allWriteups.filter(w =>
+     w.title.toLowerCase().includes(q) ||
+     w.desc.toLowerCase().includes(q)
   );
-}
-if(localStorage.getItem("mode")==="dark") {
-  document.documentElement.classList.add("dark");
-}
+  page = 1;
+  renderList();
+});
+
+// -------- INIT --------
+loadWriteups().then(list => {
+  allWriteups = list;
+  filtered = list;
+  renderList();
+});
 </script>
 
 </body>
