@@ -1,66 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Write-ups • Solasakicomics</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write-ups • Solasaki Comics</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" type="image/png" href="/logo.png">
 
   <meta name="description" content="Read personal write-ups, stories, and thoughts from Solasakicomics.">
 
   <style>
-    .writeup-container {
-      max-width: 750px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
+    .writeup-container { max-width: 750px; margin: 40px auto; padding: 0 20px; }
     .search-box {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      font-size: 16px;
+      width: 100%; padding: 12px; border: 1px solid #ccc;
+      border-radius: 8px; margin-bottom: 25px; font-size: 16px;
+      background: var(--bg); color: var(--text);
     }
     .card {
-      padding: 20px;
-      margin-bottom: 18px;
-      border-radius: 12px;
-      border: 1px dashed #aaa;
-      background: #fffefc;
+      padding: 20px; margin-bottom: 18px; border-radius: 12px;
+      border: 1px dashed var(--border); background: var(--card);
       transition: 0.2s;
     }
-    .card:hover { background: #fff; }
-    .card-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-    .card-meta {
-      font-size: 14px;
-      opacity: .7;
-      margin-bottom: 10px;
-    }
+    .card:hover { background: var(--card-hover); }
+    .card-title { font-size: 22px; font-weight: bold; margin-bottom: 6px; }
+    .card-meta { font-size: 14px; opacity: 0.7; margin-bottom: 10px; }
   </style>
 </head>
 
 <body>
 
-<!-- HEADER (SAME AS OTHER PAGES) -->
+<!-- HEADER (same as all other pages) -->
 <header>
   <div class="logo-row">
-    <img src="logo.png" class="logo">
+    <img src="/logo.png" class="logo">
     <h1 class="brand">Solasaki Comics</h1>
   </div>
 
   <nav class="navbar">
-    <a href="index.html">Home</a>
-    <a href="comics.html">Comics</a>
-    <a class="active" href="writeups.html">Write-ups</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
+    <a href="/index.html">Home</a>
+    <a href="/comics.html">Comics</a>
+    <a class="active" href="/writeups.html">Write-ups</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
     <button id="themeToggle" class="theme-btn">🌙</button>
   </nav>
 
@@ -69,7 +51,9 @@
 
 <div class="writeup-container">
   <h1>Write-ups</h1>
-  <input id="search" class="search-box" placeholder="Search write-ups…">
+
+  <input class="search-box" id="search" placeholder="Search write-ups…">
+
   <div id="list"></div>
 </div>
 
@@ -77,22 +61,51 @@
   <p>© 2025 Solasaki Comics</p>
 </footer>
 
+<!-- NIGHT MODE JS (must be included on this page!) -->
+<script>
+document.getElementById("themeToggle").addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+});
+
+// Load saved theme
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark-mode");
+}
+</script>
+
+<!-- WRITE-UP LOADER SCRIPT -->
 <script>
 async function loadWriteups() {
-  // READ THE LIST.JSON FILE
-  const res = await fetch("/writeups/list.json");
-  const posts = await res.json();
+  const folder = "/writeups/";
+  const res = await fetch(folder);
+  const html = await res.text();
+
+  // detect .txt files in directory
+  let files = [...html.matchAll(/href="([^"]+\.txt)"/g)].map(m => m[1]);
 
   const list = document.getElementById("list");
-
-  if (!posts.length) {
+  if (!files.length) {
     list.innerHTML = "<p>No write-ups yet…</p>";
     return;
   }
 
+  let posts = [];
+
+  for (const file of files) {
+    const txt = await fetch(folder + file).then(r => r.text());
+    const lines = txt.split("\n");
+
+    const title = lines[0].trim();
+    const preview = lines.slice(1, 5).join(" ").slice(0, 180) + "...";
+    const readingTime = Math.ceil(txt.split(" ").length / 180);
+
+    posts.push({ file, title, preview, readingTime });
+  }
+
   function render(items) {
     list.innerHTML = items.map(p => `
-      <a href="read.html?post=${p.file}">
+      <a href="/read.html?post=${p.file}">
         <div class="card">
           <div class="card-title">${p.title}</div>
           <div class="card-meta">${p.readingTime} min read</div>
@@ -104,7 +117,6 @@ async function loadWriteups() {
 
   render(posts);
 
-  // SEARCH
   document.getElementById("search").addEventListener("input", e => {
     const q = e.target.value.toLowerCase();
     render(posts.filter(p =>
