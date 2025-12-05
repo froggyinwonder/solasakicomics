@@ -1,42 +1,35 @@
-<div class="page slide-up" id="content"></div>
+<div class="page slide-up" id="reader"></div>
 
 <script>
-async function load() {
+async function loadPost() {
   const params = new URLSearchParams(location.search);
-  const slug = params.get("post");
+  const post = params.get("post");
 
-  const res = await fetch(`writeups/${slug}.md`);
-  const md = await res.text();
+  const res = await fetch(`/writeups/${post}.txt`);
+  if (!res.ok) {
+    document.getElementById("reader").innerHTML = "Post not found.";
+    return;
+  }
 
-  const section = document.getElementById("content");
-  const parts = md.split("---");
-  const metaRaw = parts[1].trim();
-  const body = parts[2].trim();
+  const text = await res.text();
+  const words = text.split(" ").length;
+  const minutes = Math.max(1, Math.ceil(words / 180));
 
-  const meta = {};
-  metaRaw.split("\n").forEach(line => {
-    const [k, ...v] = line.split(":");
-    meta[k.trim()] = v.join(":").trim();
-  });
-
-  section.innerHTML = `
-    <h1>${meta.title}</h1>
-    <p class="meta">${meta.date} • ${Math.ceil(body.split(/\s+/).length / 200)} min read</p>
-    <article>${body.replace(/\n/g, "<br>")}</article>
+  document.getElementById("reader").innerHTML = `
+    <h1>${post}</h1>
+    <p><em>⏱ ${minutes} min read</em></p>
+    <div class="content">${text.replace(/\n/g, "<br><br>")}</div>
   `;
 }
-
-load();
+loadPost();
 </script>
 
 <style>
-article {
-  font-size: 17px;
-  line-height: 1.7;
-  margin-top: 20px;
-}
-
-.meta {
-  opacity: 0.6;
+#reader {
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+  line-height:1.6;
+  font-size:18px;
 }
 </style>
