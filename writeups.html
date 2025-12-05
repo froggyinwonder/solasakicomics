@@ -8,53 +8,62 @@
   <link rel="stylesheet" href="/style.css" />
   <link rel="icon" type="image/png" href="/logo.png">
 
+  <!-- LOCAL STYLES (ONLY FOR WRITE-UPS PAGE) -->
   <style>
     .writeups-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
       max-width: 750px;
-      margin: 30px auto;
+      margin: 20px auto 60px auto;
       padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .writeup-card {
       display: block;
-      padding: 18px;
-      background: var(--paper);
+      padding: 16px 18px;
       border: 2px dashed var(--border);
       border-radius: 12px;
+      background: var(--paper);
       text-decoration: none;
       color: var(--ink);
       transition: 0.2s ease;
     }
 
     .writeup-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 14px var(--shadow);
+      transform: translateY(-3px);
     }
 
     .writeup-card h3 {
-      margin: 0 0 6px 0;
+      margin: 0 0 4px 0;
       font-family: "Patrick Hand";
-      font-size: 24px;
+      font-size: 22px;
+    }
+
+    .meta {
+      font-size: 14px;
+      opacity: 0.6;
+      margin-bottom: 6px;
     }
 
     .excerpt {
       color: var(--muted);
       font-size: 15px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
-    .meta {
-      font-size: 14px;
-      opacity: 0.7;
+    .read-more {
+      display: inline-block;
+      margin-top: 4px;
+      font-family: "Patrick Hand";
+      color: var(--accent);
+      font-size: 16px;
     }
 
     .search-box {
       width: 100%;
       max-width: 750px;
-      margin: 20px auto;
+      margin: 10px auto 25px auto;
       display: block;
       padding: 12px;
       border-radius: 10px;
@@ -84,10 +93,13 @@
   </nav>
 </header>
 
+<!-- PAGE TITLE -->
 <h1 style="text-align:center; font-family:'Patrick Hand'; margin-top:25px;">Write-ups</h1>
 
+<!-- SEARCH -->
 <input id="search" class="search-box" placeholder="Search write-ups…">
 
+<!-- LIST -->
 <div id="list" class="writeups-grid"></div>
 
 <footer>
@@ -95,36 +107,54 @@
 </footer>
 
 <script>
-// DARK MODE
+/* ===========================
+   DARK MODE
+=========================== */
 document.getElementById("themeToggle").onclick = () => {
   document.documentElement.classList.toggle("dark");
-  localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+  localStorage.setItem("theme", 
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
+  );
 };
-if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
 
-// LOAD WRITEUPS FROM list.json
+if (localStorage.getItem("theme") === "dark") {
+  document.documentElement.classList.add("dark");
+}
+
+/* ===========================
+   LOAD WRITEUPS FROM list.json
+=========================== */
 async function loadWriteups() {
   const posts = await fetch("/writeups/list.json").then(r => r.json());
+  const list = document.getElementById("list");
 
+  // RENDER FUNCTION (UPDATED WITH TRIM + READ MORE)
   function render(items) {
-    document.getElementById("list").innerHTML = items.map(p => `
+    list.innerHTML = items.map(p => `
       <a class="writeup-card" href="/read.html?post=${p.file}">
         <h3>${p.title}</h3>
         <div class="meta">${p.readingTime} min read</div>
-        <div class="excerpt">${p.preview}</div>
+
+        <div class="excerpt">
+          ${p.preview.length > 80 ? p.preview.slice(0, 80) + "..." : p.preview}
+        </div>
+
+        ${p.preview.length > 80 ? `<span class="read-more">Read more →</span>` : ""}
       </a>
     `).join("");
   }
 
   render(posts);
 
-  // SEARCH
+  // SEARCH FILTER
   document.getElementById("search").oninput = e => {
     const q = e.target.value.toLowerCase();
-    render(posts.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.preview.toLowerCase().includes(q)
-    ));
+    render(
+      posts.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.preview.toLowerCase().includes(q)
+      )
+    );
   };
 }
 
