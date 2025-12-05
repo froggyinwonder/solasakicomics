@@ -1,68 +1,75 @@
 <div class="page slide-up">
   <h2>Write-ups</h2>
-  <input id="searchBar" type="text" placeholder="Search write-ups…" style="width:100%;padding:8px;margin:10px 0;">
-  <div id="writeupsContainer"></div>
-  <div id="pagination" style="margin-top:20px;text-align:center;"></div>
+
+  <input id="search" placeholder="Search write-ups…" class="search-input">
+
+  <div id="writeList" class="cards"></div>
 </div>
 
 <script>
-async function loadWriteups() {
-  try {
-    const res = await fetch("/writeups.json");
-    const posts = await res.json();
+async function load() {
+  const res = await fetch("writeups.json");
+  const posts = await res.json();
 
-    let filtered = posts;
-    let currentPage = 1;
-    const perPage = 5;
+  const box = document.getElementById("writeList");
+  const search = document.getElementById("search");
 
-    const container = document.getElementById("writeupsContainer");
-    const pagination = document.getElementById("pagination");
-    const searchBar = document.getElementById("searchBar");
-
-    function readingTime(text) {
-      const words = text.trim().split(/\s+/).length;
-      return Math.ceil(words / 150) + " min read"; 
-    }
-
-    function render() {
-      const start = (currentPage - 1) * perPage;
-      const pageItems = filtered.slice(start, start + perPage);
-
-      container.innerHTML = pageItems.map(p => `
-        <div class="card" style="border:1px dashed #aaa;padding:15px;margin-bottom:15px;border-radius:10px;">
-          <h3>${p.title}</h3>
-          <small>${new Date(p.date).toDateString()} • ${readingTime(p.content)}</small>
-          <p>${p.summary}</p>
-          <a href="read.html?id=${p.id}" class="read-more">Read more →</a>
+  function display(list) {
+    box.innerHTML = list.map(p => `
+      <a class="card" href="read.html?post=${p.slug}">
+        <h3>${p.title}</h3>
+        <p>${p.subtitle}</p>
+        <div class="meta">
+          <span>${p.date}</span> • 
+          <span>${p.readingTime} min read</span>
         </div>
-      `).join("");
-
-      const totalPages = Math.ceil(filtered.length / perPage);
-      pagination.innerHTML = `
-        <button onclick="prevPage()" ${currentPage==1?"disabled":""}>Prev</button>
-        <span style="margin:0 10px">${currentPage} / ${totalPages}</span>
-        <button onclick="nextPage()" ${currentPage==totalPages?"disabled":""}>Next</button>
-      `;
-    }
-
-    window.prevPage = () => { if (currentPage > 1) { currentPage--; render(); } };
-    window.nextPage = () => { 
-      const totalPages = Math.ceil(filtered.length / perPage);
-      if (currentPage < totalPages) { currentPage++; render(); } 
-    };
-
-    searchBar.addEventListener("input", () => {
-      const q = searchBar.value.toLowerCase();
-      filtered = posts.filter(p => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q));
-      currentPage = 1;
-      render();
-    });
-
-    render();
-  } catch (err) {
-    document.getElementById("writeupsContainer").innerHTML = "<p>Could not load write-ups.</p>";
+      </a>
+    `).join("");
   }
+
+  display(posts);
+
+  search.addEventListener("input", () => {
+    const q = search.value.toLowerCase();
+    display(posts.filter(p => p.title.toLowerCase().includes(q)));
+  });
 }
 
-loadWriteups();
+load();
 </script>
+
+<style>
+.search-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0 20px;
+  border: 2px dashed #000;
+  border-radius: 6px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  text-decoration: none;
+  color: black;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.meta {
+  font-size: 13px;
+  opacity: 0.6;
+  margin-top: 8px;
+}
+</style>
