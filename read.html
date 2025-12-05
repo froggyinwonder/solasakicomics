@@ -1,205 +1,68 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Write-up — Solasaki Comics</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Markdown parser -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Read • Solasaki Comics</title>
+  <link rel="stylesheet" href="/style.css">
 
   <style>
-    /* ------------------------------
-       MEDIUM-STYLE READING LAYOUT
-       ------------------------------ */
-    .read-container {
-      max-width: 760px;
+    .reader {
+      max-width: 750px;
       margin: 40px auto;
       padding: 0 20px;
-    }
-
-    .read-title {
-      font-family: "Patrick Hand";
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
-    .read-meta {
-      color: #6a6a6a;
-      font-size: 15px;
-      margin-bottom: 25px;
-    }
-
-    /* Medium style typography */
-    #content h1, 
-    #content h2, 
-    #content h3 {
-      font-family: "Patrick Hand";
-      margin-top: 28px;
-      margin-bottom: 12px;
-    }
-
-    #content p {
       line-height: 1.7;
-      margin: 14px 0;
-      font-size: 17px;
+      font-size: 18px;
     }
-
-    #content img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin: 18px 0;
-    }
-
-    /* Auto table of contents */
-    .toc-box {
-      border-left: 3px solid var(--accent);
-      padding-left: 16px;
-      margin-bottom: 30px;
-    }
-
-    .toc-box h3 {
-      margin-bottom: 8px;
-      font-family: "Patrick Hand";
-    }
-
-    .toc-box a {
-      display: block;
-      margin: 4px 0;
-      text-decoration: none;
-      color: var(--ink);
-    }
-
-    .toc-box a:hover {
-      color: var(--accent);
-    }
+    h1 { font-size: 32px; margin-bottom: 8px; }
+    .meta { opacity: 0.6; margin-bottom: 20px; }
   </style>
 </head>
 
-<body class="fade">
+<body>
 
-<!-- ⭐ NORMAL HEADER (unchanged) -->
 <header>
-  <div class="logoarea">
-    <img src="assets/uploads/IMG_0079.jpeg">
-    <h1>Solasaki Comics</h1>
+  <div class="header-wrapper">
+    <a href="/" class="logo-link"><img src="/logo.png" class="logo"></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/comics.html">Comics</a>
+      <a class="active" href="/writeups.html">Write-ups</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
   </div>
-
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="comics.html">Comics</a>
-    <a href="writeups.html">Write-ups</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-
-  <button class="toggle-mode" onclick="toggleMode()">🌙</button>
 </header>
 
+<div class="reader" id="reader">Loading…</div>
 
-<!-- ⭐ MEDIUM STYLE READING AREA -->
-<div class="read-container">
-  
-  <h1 class="read-title" id="postTitle">Loading…</h1>
-  <div class="read-meta" id="postMeta"></div>
-
-  <div class="toc-box" id="tocBox" style="display:none;">
-    <h3>Contents</h3>
-    <div id="toc"></div>
-  </div>
-
-  <div id="content"></div>
-</div>
-
-
-<footer>© 2025 Solasaki Comics</footer>
-
+<footer>
+  <p>© 2025 Solasaki Comics</p>
+</footer>
 
 <script>
-/* -----------------------------------------
-   Extract ?post=filename from URL
------------------------------------------ */
-const params = new URLSearchParams(window.location.search);
-const file = params.get("post");
+async function loadPost() {
+  const params = new URLSearchParams(location.search);
+  const file = params.get("post");
+  if (!file) return;
 
-if (!file) {
-  document.getElementById("postTitle").textContent = "Nothing found";
+  const txt = await fetch("/writeups/" + file).then(r => r.text());
+
+  const lines = txt.split("\n");
+  const title = lines[0];
+  const body = lines.slice(1).join("\n").replace(/\n/g, "<br>");
+
+  const readingTime = Math.ceil(txt.split(" ").length / 180);
+
+  document.getElementById("reader").innerHTML = `
+    <a href="/writeups.html">← Back</a>
+    <h1>${title}</h1>
+    <div class="meta">${readingTime} min read</div>
+    <div>${body}</div>
+  `;
 }
 
-
-
-/* -----------------------------------------
-   Fetch markdown from /writeups/
------------------------------------------ */
-fetch(`/writeups/${file}.md`)
-  .then(res => res.text())
-  .then(md => {
-
-    // Extract first heading as post title
-    const firstLine = md.split("\n")[0].replace("#","").trim();
-    document.getElementById("postTitle").textContent = firstLine;
-
-    // Reading time
-    const words = md.split(/\s+/).length;
-    const minutes = Math.max(1, Math.round(words / 150));
-
-    document.getElementById("postMeta").textContent =
-      `${minutes} min read`;
-
-    // Render markdown body
-    const html = marked.parse(md);
-    document.getElementById("content").innerHTML = html;
-
-    // Auto generate TOC
-    generateTOC();
-  })
-  .catch(() => {
-    document.getElementById("postTitle").textContent = "Not found";
-  });
-
-
-
-/* -----------------------------------------
-   Generate a Medium-style TOC
------------------------------------------ */
-function generateTOC() {
-  const content = document.getElementById("content");
-  const headings = content.querySelectorAll("h2, h3");
-
-  if (headings.length === 0) return;
-
-  document.getElementById("tocBox").style.display = "block";
-
-  const toc = document.getElementById("toc");
-  toc.innerHTML = "";
-
-  headings.forEach(h => {
-    const id = h.textContent.replace(/\s+/g, "-").toLowerCase();
-    h.id = id;
-
-    const link = document.createElement("a");
-    link.href = `#${id}`;
-    link.textContent = h.textContent;
-
-    toc.appendChild(link);
-  });
-}
-
-
-/* -----------------------------------------
-   Dark mode (same as other pages)
------------------------------------------ */
-function toggleMode() {
-  document.documentElement.classList.toggle("dark");
-  localStorage.setItem(
-    "mode",
-    document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
-}
-
-if (localStorage.getItem("mode") === "dark") {
-  document.documentElement.classList.add("dark");
-}
+loadPost();
 </script>
 
 </body>
