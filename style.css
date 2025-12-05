@@ -885,4 +885,113 @@ body, html {
 /* ---------------------------------------------------
    FIX HEADER OVERLAP ON MOBILE
 --------------------------------------------------- */
+/* ---------------------------------------------------
+   UNIVERSAL RESPONSIVE FIX FOR ALL PAGES
+--------------------------------------------------- */
+
+/* Prevent sideways scroll on ANY device */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure header does not overlap */
+header {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Responsive navigation */
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Fit all page content */
+.page,
+.hero-wall,
+.comic-wall,
+.writeup-container,
+.contact-page {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------
+   FIX: WELCOME TO MY SKETCHBOOK BANNER OVERLAPPING
+--------------------------------------------------- */
+
+.hero-wall img,
+.hero-banner img,
+#main-art,
+.featured-art,
+.top-illustration {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* The yellow banner container should also resize */
+.hero-wall {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Text inside banner should wrap naturally */
+.hero-wall h2,
+.hero-wall .banner-text {
+  font-size: clamp(18px, 4vw, 26px);
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* ---------------------------------------------------
+   SMALL-PHONE FIXES
+--------------------------------------------------- */
+@media (max-width: 480px) {
+  
+  .logoarea img {
+    width: 42px;
+    height: 42px;
+  }
+
+  header {
+    padding: 10px 12px;
+    justify-content: center;
+  }
+
+  nav a {
+    font-size: 15px;
+  }
+
+  /* Hero section becomes fully responsive */
+  .hero-wall {
+    padding: 10px;
+  }
+
+  .hero-wall img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Make banner text readable on tiny screens */
+  .hero-wall h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  /* Canvas fix */
+  #drawCanvas {
+    height: 260px !important;
+  }
+}
 
