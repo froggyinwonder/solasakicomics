@@ -1,75 +1,72 @@
 <div class="page slide-up">
-  <h2>Write-ups</h2>
+  <h2 class="page-title">Write-ups</h2>
 
-  <input id="search" placeholder="Search write-ups…" class="search-input">
+  <input id="searchBox" type="text" placeholder="Search write-ups…" />
 
-  <div id="writeList" class="cards"></div>
+  <div id="writeupsContainer" class="writeups-list"></div>
 </div>
 
 <script>
-async function load() {
-  const res = await fetch("writeups.json");
-  const posts = await res.json();
+async function loadWriteups() {
+  const container = document.getElementById("writeupsContainer");
 
-  const box = document.getElementById("writeList");
-  const search = document.getElementById("search");
+  // List of files (edit names only here!)
+  const files = [
+    "weird",
+    "stay",
+    "everything"
+  ];
 
-  function display(list) {
-    box.innerHTML = list.map(p => `
-      <a class="card" href="read.html?post=${p.slug}">
-        <h3>${p.title}</h3>
-        <p>${p.subtitle}</p>
-        <div class="meta">
-          <span>${p.date}</span> • 
-          <span>${p.readingTime} min read</span>
-        </div>
+  container.innerHTML = "";
+
+  for (const name of files) {
+    const res = await fetch(`/writeups/${name}.txt`);
+    if (!res.ok) continue;
+
+    const text = await res.text();
+    const preview = text.substring(0, 150) + "...";
+
+    const minutes = Math.max(1, Math.ceil(text.split(" ").length / 180));
+
+    const card = `
+      <a class="write-card" href="read.html?post=${name}">
+        <h3>${name}</h3>
+        <p>${preview}</p>
+        <small>⏱ ${minutes} min read</small>
       </a>
-    `).join("");
+    `;
+
+    container.insertAdjacentHTML("beforeend", card);
   }
-
-  display(posts);
-
-  search.addEventListener("input", () => {
-    const q = search.value.toLowerCase();
-    display(posts.filter(p => p.title.toLowerCase().includes(q)));
-  });
 }
 
-load();
+loadWriteups();
+
+
+// 🔍 SEARCH
+document.getElementById("searchBox").addEventListener("input", function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll(".write-card").forEach(card => {
+    card.style.display = card.textContent.toLowerCase().includes(q)
+      ? "block"
+      : "none";
+  });
+});
 </script>
 
 <style>
-.search-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0 20px;
-  border: 2px dashed #000;
-  border-radius: 6px;
+.write-card {
+  display:block;
+  padding:16px;
+  margin:12px 0;
+  border:1px solid #ddd;
+  border-radius:8px;
+  text-decoration:none;
+  color:black;
+  background:white;
 }
-
-.cards {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.write-card:hover {
+  background:#fafafa;
 }
-
-.card {
-  padding: 18px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  background: #fff;
-  text-decoration: none;
-  color: black;
-}
-
-.card h3 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.meta {
-  font-size: 13px;
-  opacity: 0.6;
-  margin-top: 8px;
-}
+.write-card h3 { margin:0 0 8px; }
 </style>
