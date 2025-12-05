@@ -1,33 +1,42 @@
-<div class="page slide-up">
-  <div id="postContainer"></div>
-</div>
+<div class="page slide-up" id="content"></div>
 
 <script>
-async function loadPost() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+async function load() {
+  const params = new URLSearchParams(location.search);
+  const slug = params.get("post");
 
-  const res = await fetch("/writeups.json");
-  const posts = await res.json();
+  const res = await fetch(`writeups/${slug}.md`);
+  const md = await res.text();
 
-  const post = posts.find(p => p.id === id);
+  const section = document.getElementById("content");
+  const parts = md.split("---");
+  const metaRaw = parts[1].trim();
+  const body = parts[2].trim();
 
-  const container = document.getElementById("postContainer");
+  const meta = {};
+  metaRaw.split("\n").forEach(line => {
+    const [k, ...v] = line.split(":");
+    meta[k.trim()] = v.join(":").trim();
+  });
 
-  if (!post) {
-    container.innerHTML = "<p>Post not found.</p>";
-    return;
-  }
-
-  const words = post.content.split(/\s+/).length;
-  const time = Math.ceil(words / 150) + " min read";
-
-  container.innerHTML = `
-    <a href="writeups.html" class="back-btn">← Back</a>
-    <h2>${post.title}</h2>
-    <small>${new Date(post.date).toDateString()} • ${time}</small>
-    <p style="margin-top:20px;white-space:pre-line;">${post.content}</p>
+  section.innerHTML = `
+    <h1>${meta.title}</h1>
+    <p class="meta">${meta.date} • ${Math.ceil(body.split(/\s+/).length / 200)} min read</p>
+    <article>${body.replace(/\n/g, "<br>")}</article>
   `;
 }
-loadPost();
+
+load();
 </script>
+
+<style>
+article {
+  font-size: 17px;
+  line-height: 1.7;
+  margin-top: 20px;
+}
+
+.meta {
+  opacity: 0.6;
+}
+</style>
